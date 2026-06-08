@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
-    id_exec BIGINT PRIMARY KEY,
+    id_exec BIGSERIAL PRIMARY KEY,
     inicio TIMESTAMP,
     fim TIMESTAMP,
     status VARCHAR(15),
