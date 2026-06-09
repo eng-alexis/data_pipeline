@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS audit.file_history(
     id_arquivo BIGSERIAL PRIMARY KEY,
     hash VARCHAR(64),
     nome_arquivo VARCHAR(100),
+    tamanho_bytes BIGINT,
     data_ingestao TIMESTAMP,
     id_exec BIGINT,
     status VARCHAR(15),
