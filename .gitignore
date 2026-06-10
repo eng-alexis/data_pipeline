@@ -1,2 +1,9 @@
+# Arquivos
+
 .venv
 .env
+
+# Pastas
+
+testes/
+__pycache__/
