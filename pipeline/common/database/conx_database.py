@@ -13,7 +13,5 @@ def get_db_connection ():
         user= os.getenv("POSTGRES_USER"),
         password= os.getenv("POSTGRES_PASSWORD")
     )
-
-    cursor = conn.cursor()
  
-    return cursor
+    return conn
