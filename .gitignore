@@ -2,8 +2,11 @@
 
 .venv
 .env
+raw_main_02.py
+
 
 # Pastas
 
 testes/
 __pycache__/
+arquivos_processados/
