@@ -2,13 +2,16 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
     id_exec BIGSERIAL PRIMARY KEY,
     inicio TIMESTAMP,
     fim TIMESTAMP,
+    arquivo VARCHAR(50),
+    hash VARCHAR(64),
     status VARCHAR(15),
+    mensagem VARCHAR(50),
 
     CONSTRAINT ck_status
     CHECK ( status IN (
-        'PENDENTE',
         'PROCESSANDO',
         'SUCESSO',
+        'DUPLICADO',
         'ERRO'))
 );
 
