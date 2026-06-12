@@ -1,20 +1,30 @@
+# Gerar hash do novo arquivo
+
+import hashlib
+
+def gerar_hash(caminho_arquivo):
+    sha256 = hashlib.sha256()
+
+    with open(caminho_arquivo, "rb") as arquivo:
+        for bloco in iter(lambda: arquivo.read(4096), b""):
+            sha256.update(bloco)
+
+    return sha256.hexdigest()
+
 # Procurar hash e nome do arquivo no banco
 
-from pipeline.common.database.conx_database import get_db_connection
+def find_hash(connection_db, hash):
 
-def find_hash(hash, nome_arquivo):
-
-    conx = get_db_connection()
+    conx = connection_db
     cursor = conx.cursor()
 
     query = """SELECT EXISTS(
                     SELECT 1 FROM audit.file_history
-                    WHERE hash = %s
-                    AND nome_arquivo = %s);"""
+                    WHERE hash = %s);"""
 
     try:
 
-        cursor.execute(query,(hash, nome_arquivo,))
+        cursor.execute(query, (hash,))
 
         resultado = cursor.fetchone()
 
