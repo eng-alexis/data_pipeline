@@ -2,7 +2,7 @@ import shutil
 
 # Registra novo arquivo no banco
 
-def reg_novo_arquivo(connection_db, hash, nome_arquivo, tamanho_bytes, id_exec):
+def reg_novo_arquivo(connection_db, hash, nome_arquivo, data_ingestao, tamanho_bytes, id_exec):
 
     conx = connection_db
 
@@ -11,9 +11,9 @@ def reg_novo_arquivo(connection_db, hash, nome_arquivo, tamanho_bytes, id_exec):
     query= """INSERT INTO audit.file_history(
                 hash, nome_arquivo, tamanho_bytes,
                 data_ingestao, id_exec, status)
-                VALUES(%s, %s, %s, CURRENT_DATE, %s, 'PROCESSADO')"""
+                VALUES(%s, %s, %s, %s, %s, 'PROCESSADO')"""
     
-    valores = (hash, nome_arquivo, tamanho_bytes, id_exec)
+    valores = (hash, nome_arquivo, tamanho_bytes, data_ingestao, id_exec)
 
     try:
 
