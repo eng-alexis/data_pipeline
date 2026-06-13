@@ -24,16 +24,19 @@ jsonl_arquivo = encontrar_arquivos(path_padrão)
 
 for arquivo in jsonl_arquivo:
 
-# Registra nova execução do pipeline na tabela de auditoria
-
-    new_exec = reg_new_execution(conexao_bd, inicio, nome_arquivo, hash_arquivo)
-
-# extrai informações e valida arquivo
+# extrai informações 
 
     inicio        = datetime.now()
     hash_arquivo  = gerar_hash(arquivo)
     nome_arquivo  = Path(arquivo).name
     tamanho_bytes = arquivo.stat().st_size
+
+# Registra nova execução do pipeline na tabela de auditoria
+
+    new_exec = reg_new_execution(conexao_bd, inicio, nome_arquivo, hash_arquivo)
+    conexao_bd.commit()
+
+# Valida arquivo
 
     sh_file  = find_hash(conexao_bd, hash_arquivo)
     
@@ -42,13 +45,18 @@ for arquivo in jsonl_arquivo:
     if sh_file:
 
         parada = datetime.now()
-        upd_exec = update_execution(parada, conexao_bd, contador, "DUPLICADO", "Hash já processado anteriormente")
+        upd_exec = update_execution(conexao_bd, parada, contador, "DUPLICADO", "Hash já processado anteriormente")
+        conexao_bd.commit()
+        print(f"Arquivo {nome_arquivo} já foi processado anteriormente")
 
 # Registra novo arquivo na tabela de auditoria.
 
     else:
 
-        new_file = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, tamanho_bytes, contador)
+        data_ingestao = datetime.now()
+        
+        new_file = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, contador)
+        conexao_bd.commit()
         if new_file:
             
 # Extrai registros e cria Lote.
@@ -90,6 +98,10 @@ for arquivo in jsonl_arquivo:
 
                 if move:
                     fim = datetime.now()
-                    update_execution(fim, conexao_bd, contador, 'SUCESSO','')
+                    update_execution(conexao_bd, fim, contador, 'SUCESSO','')
+                    conexao_bd.commit()
+
+                    print("Pipeline Concluido")
+                    print(f"Registros carregados: {qtd_registros}")
     
     contador += 1
