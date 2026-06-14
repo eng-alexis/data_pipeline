@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
-    id_exec BIGSERIAL PRIMARY KEY,
+    id_exec BIGINT PRIMARY KEY,
     inicio TIMESTAMP,
     fim TIMESTAMP,
     arquivo VARCHAR(50),
@@ -58,3 +58,15 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_step(
     FOREIGN KEY (id_arquivo)
     REFERENCES audit.file_history(id_arquivo)
 );
+
+CREATE TABLE audit.pipeline_watermark(
+    id_watermark SERIAL,
+    watermark_name VARCHAR(40),
+    ultimo_id INTEGER,
+    data_execucao TIMESTAMP
+);
+
+INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('context_last_id');
+INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.eventos_last_id');
+INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.produtos_last_id');
+INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.lojas_last_id');
