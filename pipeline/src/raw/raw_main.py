@@ -1,5 +1,6 @@
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution, update_execution
+from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec, upd_watermark_layer
 
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos, extrair_registros
 from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
@@ -16,13 +17,15 @@ path_processado = "/home/alexis/data_pipeline/pipeline/arquivos_processados/"
 
 conexao_bd = get_db_connection()
 cursor     = conexao_bd.cursor()
-contador   = 1
-
-# Inicia Pipeline
 
 jsonl_arquivo = encontrar_arquivos(path_padrão)
 
 for arquivo in jsonl_arquivo:
+
+# Inicia Pipeline
+
+    id_exec = gerar_id_contexto(conexao_bd)
+    print(f"id atual {id_exec}")
 
 # extrai informações 
 
@@ -33,7 +36,7 @@ for arquivo in jsonl_arquivo:
 
 # Registra nova execução do pipeline na tabela de auditoria
 
-    new_exec = reg_new_execution(conexao_bd, inicio, nome_arquivo, hash_arquivo)
+    new_exec = reg_new_execution(conexao_bd, id_exec, inicio, nome_arquivo, hash_arquivo)
     conexao_bd.commit()
 
 # Valida arquivo
@@ -44,9 +47,11 @@ for arquivo in jsonl_arquivo:
 
     if sh_file:
 
-        parada = datetime.now()
-        upd_exec = update_execution(conexao_bd, parada, contador, "DUPLICADO", "Hash já processado anteriormente")
+        fim = datetime.now()
+        upd_exec = update_execution(conexao_bd, id_exec, fim, "DUPLICADO", "Hash já processado anteriormente")
+        upd_id_exec = upd_watermark_exec(conexao_bd, id_exec, fim)
         conexao_bd.commit()
+        
         print(f"Arquivo {nome_arquivo} já foi processado anteriormente")
 
 # Registra novo arquivo na tabela de auditoria.
@@ -55,7 +60,7 @@ for arquivo in jsonl_arquivo:
 
         data_ingestao = datetime.now()
         
-        new_file = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, contador)
+        new_file = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
         conexao_bd.commit()
         if new_file:
             
@@ -98,10 +103,9 @@ for arquivo in jsonl_arquivo:
 
                 if move:
                     fim = datetime.now()
-                    update_execution(conexao_bd, fim, contador, 'SUCESSO','')
+                    update_execution(conexao_bd, id_exec, fim, 'SUCESSO','')
+                    upd_watermark_exec(conexao_bd, id_exec, fim)
                     conexao_bd.commit()
 
                     print("Pipeline Concluido")
                     print(f"Registros carregados: {qtd_registros}")
-    
-    contador += 1
