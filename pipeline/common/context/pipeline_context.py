@@ -8,15 +8,15 @@ def gerar_id_contexto(conection_db):
     cursor.execute("""
     SELECT COALESCE(ultimo_id, 0)
     FROM audit.pipeline_watermark
-    WHERE watermark_name = 'pipeline_last_id_exec';
+    WHERE watermark_name = 'context_last_id';
 """)
 
-    resultado = cursor.fetchone()
+    resultado = cursor.fetchone()[0]
 
     if resultado is None:
         valor = 1
     else:
-        retorno = resultado[0]
+        retorno = resultado
         valor = retorno + 1
 
     return valor
@@ -29,8 +29,8 @@ def upd_watermark_exec(conection_db, id_exec_atual, data_execução):
     cursor = conx.cursor()
 
     query = ("""UPDATE audit.pipeline_watermark
-                        SET ultimo_id = %s, data_execucao = %s,
-                        WHERE watermark_name = 'pipeline_last_id_exec';""")
+                        SET ultimo_id = %s, data_execucao = %s
+                        WHERE watermark_name = 'context_last_id';""")
     
     valores = (id_exec_atual, data_execução)
 
@@ -51,7 +51,7 @@ def upd_watermark_layer(conection_bd, entidade, watermark_name, data_execução)
                 ORDER by id DESC""")
 
     cursor.execute(query_1, (entidade,))
-    ultimo_id = cursor.fetchone()
+    ultimo_id = cursor.fetchone()[0]
 
     # Atualiza o watermark com o valor do ultimo id da entidade
 
