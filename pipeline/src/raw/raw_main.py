@@ -1,10 +1,14 @@
+# Importa funções
+
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution, update_execution
+from pipeline.common.monitoring.pipeline_step import reg_new_step
 from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec, upd_watermark_layer
 
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos, extrair_registros
 from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
 from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, move_file
+
 from pipeline.src.raw.load.load_raw import load_to_raw
 
 from pathlib import Path
@@ -25,7 +29,6 @@ for arquivo in jsonl_arquivo:
 # Inicia Pipeline
 
     id_exec = gerar_id_contexto(conexao_bd)
-    print(f"id atual {id_exec}")
 
 # extrai informações 
 
@@ -33,6 +36,7 @@ for arquivo in jsonl_arquivo:
     hash_arquivo  = gerar_hash(arquivo)
     nome_arquivo  = Path(arquivo).name
     tamanho_bytes = arquivo.stat().st_size
+    entidade      = 'raw.eventos'
 
 # Registra nova execução do pipeline na tabela de auditoria
 
@@ -62,6 +66,7 @@ for arquivo in jsonl_arquivo:
         
         new_file = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
         conexao_bd.commit()
+
         if new_file:
             
 # Extrai registros e cria Lote.
@@ -71,9 +76,11 @@ for arquivo in jsonl_arquivo:
             lote = []
             tam_lote = 1000
             qtd_lote = 0
-            qtd_registros = 0
+            linhas_lidas = 0
+            linhas_gravadas = 0
             
             for linha in registros:
+                linhas_lidas += 1
 
                 lote.append(linha)
                 
@@ -83,7 +90,7 @@ for arquivo in jsonl_arquivo:
                     
                     load = load_to_raw(conexao_bd, nome_arquivo, lote)
                     conexao_bd.commit()
-                    qtd_registros += len(lote)
+                    linhas_gravadas += len(lote)
                     lote.clear()
                     qtd_lote += 1
             
@@ -91,7 +98,7 @@ for arquivo in jsonl_arquivo:
 
                 load = load_to_raw(conexao_bd, nome_arquivo, lote)
                 conexao_bd.commit()
-                qtd_registros += len(lote)
+                linhas_gravadas += len(lote)
                 qtd_lote += 1
                 lote.clear()
 
@@ -102,10 +109,16 @@ for arquivo in jsonl_arquivo:
                 move = move_file(arquivo, path_processado)
 
                 if move:
+
                     fim = datetime.now()
+
                     update_execution(conexao_bd, id_exec, fim, 'SUCESSO','')
                     upd_watermark_exec(conexao_bd, id_exec, fim)
                     conexao_bd.commit()
 
-                    print("Pipeline Concluido")
-                    print(f"Registros carregados: {qtd_registros}")
+                    diferenca = (fim - inicio)
+                    duracao   = diferenca.total_seconds()
+
+# Atualiza tabela audit.pipeline_step
+
+                    reg_new_step(conexao_bd, id_exec, new_file, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio, fim, duracao)
