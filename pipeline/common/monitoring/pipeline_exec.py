@@ -1,19 +1,24 @@
-def reg_new_execution(connection_db, inicio, nome_arquivo, hash):
+# Registra nova execução e define o id da execução
+
+def reg_new_execution(connection_db, id_exec, inicio, nome_arquivo, hash):
 
     conx = connection_db
     cursor = conx.cursor()
 
-    query = """INSERT INTO audit.pipeline_execution (inicio,
+    query = """INSERT INTO audit.pipeline_execution (id_exec, inicio,
     arquivo, hash, status)
-    VALUES(%s, %s, %s, 'PROCESSANDO');"""
+    VALUES(%s, %s, %s, %s, 'PROCESSANDO')
+    ;"""
 
-    valores = (inicio, nome_arquivo, hash)
+    valores = (id_exec, inicio, nome_arquivo, hash)
+    cursor.execute(query, valores)
 
-    cursor.execute(query,valores)
+    return True
+
 
 # Atualizar execução do pipeline
 
-def update_execution(connection_db, fim, id_exec_atual, status, mensagem):
+def update_execution(connection_db, id_exec_atual, fim, status, mensagem):
     
     conx = connection_db
     cursor = conx.cursor()
