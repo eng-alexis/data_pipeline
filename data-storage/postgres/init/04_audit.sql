@@ -1,3 +1,5 @@
+-- Tabelas de auditoria
+
 CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
     id_exec BIGINT PRIMARY KEY,
     inicio TIMESTAMP,

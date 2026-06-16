@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS silver.eventos(
     id_pedido   INTEGER,
     produto_id  INTEGER,
     quantidade  INTEGER,
-    valor_unitario NUMERIC(6,2)
+    valor_unitario NUMERIC(6,2),
+    id_pipeline_exec BIGINT,
+    data_ingestao TIMESTAMP
 );
 
 -- Tabela silver.produtos

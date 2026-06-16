@@ -3,12 +3,11 @@
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution, update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
-from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec, upd_watermark_layer
+from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec
 
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos, extrair_registros
 from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
 from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, move_file
-
 from pipeline.src.raw.load.load_raw import load_to_raw
 
 from pathlib import Path
@@ -16,8 +15,8 @@ from datetime import datetime
 
 # Diretorios e utilitarios
 
-path_padrão     = "/home/alexis/data_pipeline/pipeline/testes/"
-path_processado = "/home/alexis/data_pipeline/pipeline/arquivos_processados/"
+path_padrão     = "/home/alexis/data_pipeline/pipeline/testes/pos/"
+path_processado = "/home/alexis/data_pipeline/pipeline/testes/arq_processados/"
 
 conexao_bd = get_db_connection()
 cursor     = conexao_bd.cursor()
