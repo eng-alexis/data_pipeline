@@ -1,3 +1,5 @@
+from psycopg2 import sql
+
 # Retorna ID da execução
 
 def gerar_id_contexto(conection_db):
@@ -45,12 +47,15 @@ def upd_watermark_layer(conection_bd, entidade, watermark_name, data_execução)
     conx = conection_bd
     cursor = conx.cursor()
 
+    entidade_name = entidade
+    schema, tabela = entidade_name.split(".")
+
     # Busca o ultimo id da entidade (ex: id 100)
 
-    query_1 = ("""SELECT id FROM %s
-                ORDER by id DESC""")
-
-    cursor.execute(query_1, (entidade,))
+    query_1 = sql.SQL("""SELECT id_raw FROM {}.{}
+                ORDER by id_raw DESC""").format(sql.Identifier(schema),
+                                                sql.Identifier(tabela))
+    cursor.execute(query_1)
     ultimo_id = cursor.fetchone()[0]
 
     # Atualiza o watermark com o valor do ultimo id da entidade

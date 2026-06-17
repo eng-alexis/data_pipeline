@@ -1,8 +1,8 @@
 # Registra informações do step do pipeline
 
-def reg_new_step(conection_bd, id_exec, id_arquivo, camada, entidade, linhas_lidas, linhas_gravadas, inicio, fim, duracao):
+def reg_new_step(conection_db, id_exec, id_arquivo, camada, entidade, linhas_lidas, linhas_gravadas, inicio, fim, duracao):
 
-    conx = conection_bd
+    conx = conection_db
     cursor = conx.cursor()
 
     query = """INSERT INTO audit.pipeline_step(
