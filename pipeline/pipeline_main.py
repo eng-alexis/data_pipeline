@@ -6,11 +6,9 @@ from pipeline.src.raw.extract.extract_json import encontrar_arquivos
 
 conx = get_db_connection()
 
-path_padrão     = "/home/alexis/data_pipeline/pipeline/testes/pos/"
+path_padrão = "/home/alexis/data_pipeline/pipeline/testes/pos/"
 
 jsonl_arquivo = encontrar_arquivos(path_padrão)
-
-
 
 for arquivo in jsonl_arquivo:
 

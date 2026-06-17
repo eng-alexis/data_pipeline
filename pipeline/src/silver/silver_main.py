@@ -24,7 +24,7 @@ def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
 
         load = load_to_silver(conexao_db, ultimo_id, sql_path)
 
-        linhas_lidas, _, linhas_gravadas = load
+        linhas_lidas, linhas_gravadas = load
 
         # Atualiza id_contexto
 
