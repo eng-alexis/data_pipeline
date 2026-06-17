@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS raw.eventos(
     id_raw SERIAL PRIMARY KEY,
     arquivo_origem TEXT,
     dados JSONB,
-    data_ingestao_raw TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    data_ingestao_raw TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     schema_status VARCHAR(20),
-    schema_versao VARCHAR(20)
+    schema_version VARCHAR(20),
     schema_error TEXT
 );
 
