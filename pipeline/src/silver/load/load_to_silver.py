@@ -40,4 +40,3 @@ def load_to_silver(conection_db, ultimo_id, script_sql):
         conx.commit()
 
     return linhas_lidas, linhas_gravadas
-

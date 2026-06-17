@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS raw.eventos(
     arquivo_origem TEXT,
     dados JSONB,
     data_ingestao_raw TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    schema_status VARCHAR(20),
+    schema_versao VARCHAR(20)
+    schema_error TEXT
 );
 
 --Tabela raw.produtos
