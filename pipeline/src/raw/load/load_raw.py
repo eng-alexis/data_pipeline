@@ -4,9 +4,9 @@ from pipeline.src.raw.validate.schema_validate import schema_validation
 
 
 
-# Carrega dados do jsonl na banco RAW
+# Carrega registros na tabela raw.eventos
 
-def load_to_raw(conx, nome_arquivo, lote):
+def load_to_raw(conx, nome_arquivo, lote, schema_version, status, obs):
 
     cursor = conx.cursor()
 
@@ -14,12 +14,11 @@ def load_to_raw(conx, nome_arquivo, lote):
 
         for linha in lote:
 
-            status, motivo = schema_validation(linha)
-
-            query = """INSERT INTO raw.eventos(arquivo_origem, dados, schema_version, schema_status, schema_error)
+            query = """INSERT INTO raw.eventos(arquivo_origem, dados, 
+                            schema_version, schema_status, observacao)
                             VALUES(%s, %s, %s, %s, %s);"""
 
-            valores = (nome_arquivo, Json(linha), 'V1', status, motivo)
+            valores = (nome_arquivo, Json(linha), schema_version, status, obs)
 
             cursor.execute(query,valores)
 
