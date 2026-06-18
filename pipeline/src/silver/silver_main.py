@@ -1,7 +1,7 @@
 
 from pipeline.src.silver.load.load_to_silver import get_ultimo_id, load_to_silver
 
-from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec, upd_watermark_layer
+from pipeline.common.context.pipeline_context import upd_watermark_exec, upd_watermark_layer
 from pipeline.common.database.conx_database import get_db_connection
 
 from pipeline.common.monitoring.pipeline_exec import update_execution

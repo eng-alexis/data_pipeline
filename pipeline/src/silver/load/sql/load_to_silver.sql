@@ -12,11 +12,14 @@ MERGE INTO silver.eventos s USING(
             (dados->>'quantidade')::INTEGER AS quantidade,
             (dados->>'valor_unitario')::NUMERIC(6,2) AS valor_unitario,
             (id_raw)::BIGINT AS id_raw,
-            (data_ingestao_raw)::TIMESTAMP AS data_ingestao_raw
+            (data_ingestao_raw)::TIMESTAMP AS data_ingestao_raw,
+            (schema_status)::VARCHAR(20) AS schema_status,
+            (schema_version)::VARCHAR(20) AS schema_version,
+            (observacao)::TEXT AS observacao
         FROM 
             raw.eventos
         WHERE
-            id_raw > %s) r
+            id_raw > %s AND schema_status = 'VALIDO') r
 
             ON (r.evento_id = s.evento_id)
 
