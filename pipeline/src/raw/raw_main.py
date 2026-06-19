@@ -11,12 +11,13 @@ from pipeline.src.raw.validate.schema_validate import load_to_quarentine
 from pipeline.src.raw.extract.extract_json import extrair_registros
 from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
 from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, move_file
-from pipeline.src.raw.load.load_raw import load_to_raw, load_to_raw_2
+from pipeline.src.raw.load.load_raw import load_to_raw
 
 from pathlib import Path
 from datetime import datetime
 
 path_processado = "/home/alexis/data_pipeline/pipeline/testes/arq_processados/"
+path_duplicado  = "/home/alexis/data_pipeline/pipeline/testes/arq_duplicados/"
 
     # Diretorios e utilitarios
 
@@ -58,6 +59,12 @@ def etapa_raw(id_execution, json_file):
             upd_exec    = update_execution(conexao_bd, id_exec, fim, "DUPLICADO", "Hash já processado anteriormente")
             upd_id_exec = upd_watermark_exec(conexao_bd, id_exec, fim)
             conexao_bd.commit()
+
+
+    # Move arquivo duplicado para pasta arq_duplicados
+
+            move_file(arquivo, path_duplicado)
+
             print("Alerta !")
             print(f"Arquivo duplicado")
             print("Pipeline Interrompido")
