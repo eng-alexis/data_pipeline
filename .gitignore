@@ -4,9 +4,9 @@
 .env
 raw_main_02.py
 
-
 # Pastas
 
-testes/
+processed_files/
 __pycache__/
 arquivos_processados/
+pdv_sales/

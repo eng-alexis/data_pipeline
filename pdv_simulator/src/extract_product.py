@@ -1,7 +1,8 @@
 from csv import DictReader
+from pdv_simulator.config.paths import CATALOGO_FILE
 import random
 
-csv_path = '/home/alexis/data_pipeline/pdv_simulator/data/produtos/catalogo.csv'
+csv_path = CATALOGO_FILE
 
 def carregar_catalogo():
 

@@ -1,5 +1,6 @@
 import json
 from csv import DictReader
+from pdv_simulator.config.paths import CATALOGO_FILE, LOJAS_FILE
 
 # Cria json com eventos de vendas
 
@@ -15,8 +16,8 @@ def salvar_json(evento, caminho):
 # Cria json com catalogo de produtos
 
 def export_catalogo(destino):
-
-    csv_file = '/home/alexis/Pipeline_Sales/src/data_generator/data/dim_produto/catalogo.csv'
+                
+    csv_file = CATALOGO_FILE
     json_file = destino
 
     produtos = []
@@ -33,7 +34,8 @@ def export_catalogo(destino):
 
 def export_lojas(destino):
 
-    csv_file = '/home/alexis/Pipeline_Sales/src/data_generator/data/dim_loja/lojas.csv'
+    csv_file = LOJAS_FILE
+
     json_file = destino
 
     lojas = []
