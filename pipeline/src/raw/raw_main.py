@@ -13,11 +13,13 @@ from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
 from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, move_file
 from pipeline.src.raw.load.load_raw import load_to_raw
 
+from pipeline.config.paths import JSON_PROCESSED_DIR, JSON_DUPLICATE_DIR
+
 from pathlib import Path
 from datetime import datetime
 
-path_processado = "/home/alexis/data_pipeline/pipeline/testes/arq_processados/"
-path_duplicado  = "/home/alexis/data_pipeline/pipeline/testes/arq_duplicados/"
+path_processado = JSON_PROCESSED_DIR
+path_duplicado  = JSON_DUPLICATE_DIR
 
     # Diretorios e utilitarios
 

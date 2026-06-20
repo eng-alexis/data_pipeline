@@ -3,10 +3,11 @@ from pipeline.src.silver.silver_main import etapa_silver
 from pipeline.common.context.pipeline_context import gerar_id_contexto
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos
+from pipeline.config.paths import JSON_EVENTS_DIR
 
 conx = get_db_connection()
 
-path_padrão = "/home/alexis/data_pipeline/pipeline/testes/pos/"
+path_padrão = JSON_EVENTS_DIR
 
 jsonl_arquivo = encontrar_arquivos(path_padrão)
 

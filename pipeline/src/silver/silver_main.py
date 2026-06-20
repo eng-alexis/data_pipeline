@@ -7,6 +7,8 @@ from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 
+from pipeline.config.paths import SQL_SCRIPT_LOAD
+
 from datetime import datetime
 
 def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
@@ -18,7 +20,7 @@ def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
 
         # Carrega dados RAW -> SILVER
 
-        sql_path = '/home/alexis/data_pipeline/pipeline/src/silver/load/sql/load_to_silver.sql'
+        sql_path = SQL_SCRIPT_LOAD
 
         ultimo_id = get_ultimo_id(conexao_db, 'raw.eventos_last_id')
 
