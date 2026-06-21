@@ -70,5 +70,3 @@ CREATE TABLE audit.pipeline_watermark(
 
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('context_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.eventos_last_id');
-INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.produtos_last_id');
-INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.lojas_last_id');
