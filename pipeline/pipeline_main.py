@@ -9,31 +9,34 @@ conx = get_db_connection()
 
 path_padrão = JSON_EVENTS_DIR
 
-jsonl_arquivo = encontrar_arquivos(path_padrão)
+tipos_esperados = ["jsonl", "json"]
 
-for arquivo in jsonl_arquivo:
+for tipo in tipos_esperados:
 
-    try:
-        id_exec = gerar_id_contexto(conx)
-        print(F"Pipeline id n° {id_exec} iniciado")
+    arquivos_encontrados = encontrar_arquivos(path_padrão, tipo)
 
-        sucesso = etapa_raw(id_exec, arquivo)
+    for arquivo in arquivos_encontrados:
 
-        if sucesso:
+        try:
+            id_exec = gerar_id_contexto(conx)
+            print(F"Pipeline id n° {id_exec} iniciado")
 
-            print("1/2 - Etapa raw comcluida")
+            sucesso = etapa_raw(id_exec, arquivo)
 
-            arquivo, inicio = sucesso
+            if sucesso:
 
-            sucesso2 = etapa_silver(id_exec, arquivo, inicio)
+                print("1/2 - Etapa raw comcluida")
 
-            if sucesso2:
+                arquivo, inicio, entidade = sucesso
 
-                print("2/2 - Etapa silver concluida")
+                sucesso2 = etapa_silver(id_exec, arquivo, inicio, entidade)
 
-                print("Pipeline Concluido")
-                print("------------------")
+                if sucesso2:
 
-    except Exception as e:
-        print(f"Erro: {e}")
+                    print("2/2 - Etapa silver concluida")
 
+                    print("Pipeline Concluido")
+                    print("------------------")
+
+        except Exception as e:
+            print(f"Erro: {e}")

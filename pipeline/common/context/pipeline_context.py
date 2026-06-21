@@ -42,19 +42,16 @@ def upd_watermark_exec(conection_db, id_exec_atual, data_execução):
 
 # Atualiza ultimo id armazenado na entidade/tabela
 
-def upd_watermark_layer(conection_bd, entidade, watermark_name, data_execução):
+def upd_watermark_layer(conection_bd, watermark_name, data_execução):
 
     conx = conection_bd
     cursor = conx.cursor()
 
-    entidade_name = entidade
-    schema, tabela = entidade_name.split(".")
-
     # Busca o ultimo id da entidade (ex: id 100)
 
-    query_1 = sql.SQL("""SELECT id_raw FROM {}.{}
-                ORDER by id_raw DESC""").format(sql.Identifier(schema),
-                                                sql.Identifier(tabela))
+    query_1 = f"""SELECT id_raw FROM raw.eventos
+                    ORDER by id_raw DESC"""
+    
     cursor.execute(query_1)
     ultimo_id = cursor.fetchone()[0]
 
