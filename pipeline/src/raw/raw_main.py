@@ -5,13 +5,12 @@ from pipeline.common.monitoring.pipeline_exec import reg_new_execution, update_e
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 from pipeline.common.context.pipeline_context import upd_watermark_exec
 
-from pipeline.src.raw.validate.schema_validate import schema_validation
-from pipeline.src.raw.validate.schema_validate import load_to_quarentine
+from pipeline.src.raw.validate.schema_validate import schema_event_validation, schema_product_validation, schema_store_validation
 
 from pipeline.src.raw.extract.extract_json import extrair_registros
 from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
 from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, move_file
-from pipeline.src.raw.load.load_raw import load_to_raw
+from pipeline.src.raw.load.load_raw import load_to_raw, load_to_quarentine, descobrir_entidade
 
 from pipeline.config.paths import JSON_PROCESSED_DIR, JSON_DUPLICATE_DIR
 
@@ -26,7 +25,7 @@ path_duplicado  = JSON_DUPLICATE_DIR
 conexao_bd = get_db_connection()
 
 def etapa_raw(id_execution, json_file):
-
+  
     try:
 
     # Inicia Pipeline
@@ -40,8 +39,6 @@ def etapa_raw(id_execution, json_file):
         hash_arquivo    = gerar_hash(arquivo)
         nome_arquivo    = Path(arquivo).name
         tamanho_bytes   = arquivo.stat().st_size
-
-        entidade        = "raw.eventos"
 
     # Registra nova execução do pipeline na tabela de auditoria
 
@@ -67,11 +64,6 @@ def etapa_raw(id_execution, json_file):
 
             move_file(arquivo, path_duplicado)
 
-            print("Alerta !")
-            print(f"Arquivo duplicado")
-            print("Pipeline Interrompido")
-            print("------------------")
-
     # Registra novo arquivo na tabela de auditoria.
 
         else:
@@ -82,42 +74,73 @@ def etapa_raw(id_execution, json_file):
             conexao_bd.commit()
 
             if new_file:
+               
                 
-    # Extrai registros e cria Lote.
+    # Descobre a entidade
 
-                registros = extrair_registros(arquivo)
+                entidade = descobrir_entidade(arquivo)
+                print("checkpoint 01")
+
+                TABELAS_RAW = {"eventos","produtos","lojas"}
+
+                if entidade not in TABELAS_RAW:
+                    raise ValueError(f"Entidade inválida: {entidade}")
+
+    # Extrai registros e cria Lote.
+                
+                if entidade == "eventos":
+                    tipo_file = "jsonl"
+
+                else:
+                    tipo_file = "json"
+
+                registros = extrair_registros(arquivo, tipo_file)
 
                 lote = []
                 tam_lote = 1000
                 linhas_lidas = 0
                 linhas_gravadas = 0
+    
+    # Verifica schema e faz o load na entidade
                 
                 for linha in registros:
                     
                     linhas_lidas += 1
 
-                    status, motivo = schema_validation(linha)
+        # Define schema_validation com base na entidade
 
-                    if not status == "VALIDO":
-                         
-                        print(status)
-                        print(motivo)
+                    if entidade == "eventos":
+
+                        nome, status, motivo = schema_event_validation(linha)
+
+                    elif entidade == "produtos":
+
+                        nome, status, motivo = schema_product_validation(linha)
+
+                    elif entidade == "lojas":
+
+                        nome, status, motivo = schema_store_validation(linha)
+
+                    else:
+                        print("schema de validação não encotrado pra essa entidade")
+
+        # Verifica status do schema_validation
+            
+                    if not status == "VALIDO":                        
 
                         load_to_quarentine(
                             conexao_bd,
-                            linha,
                             nome_arquivo,
+                            linha,
+                            entidade,
+                            nome,
                             status,
                             motivo
                         )
-                        print("ENVIANDO PARA RAW")
-                        print(linha)
 
-                        load_to_raw(conexao_bd, nome_arquivo, [linha], 'V1', 'INVALIDO', 'quarentena')
+                        nome_entidade = f"raw.{entidade}"
+                        load_to_raw(conexao_bd, nome_arquivo, [linha], nome_entidade, nome, 'INVALIDO', 'quarentena')
                         conexao_bd.commit()
-
-                        
-                        print("CHEGOU NO LOAD RAW")
 
                     else:
 
@@ -127,22 +150,21 @@ def etapa_raw(id_execution, json_file):
 
                     if lote == tam_lote: # <- dentro do loop
                         
-                        load = load_to_raw(conexao_bd, nome_arquivo, lote, 'V1', 'VALIDO', None)
+                        load = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
                         conexao_bd.commit()
-                        linhas_gravadas += len(lote)
+                        linhas_gravadas += len(lote)                            
                         lote.clear()
                 
                 if lote: # <- fora do loop
 
-                    load_2 = load_to_raw(conexao_bd, nome_arquivo, lote, 'V1', 'VALIDO', None)
+                    load_2 = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
                     conexao_bd.commit()
                     linhas_gravadas += len(lote)
                     
                     lote.clear()
-                    print("parte 01 ok")
 
                 if load_2:
-
+                        
     # Move arquivos processados e finaliza a etapa de ingestão.
 
                     move = move_file(arquivo, path_processado)
@@ -157,9 +179,8 @@ def etapa_raw(id_execution, json_file):
 
                         reg_new_step(conexao_bd, id_exec, new_file, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
                         conexao_bd.commit()
-                        print("parte 02 ok")
 
-                        return new_file, inicio_pipeline
+                        return new_file, inicio_pipeline, entidade
 
     except Exception as e:
         print(f"Erro na etapa raw: {e}")
