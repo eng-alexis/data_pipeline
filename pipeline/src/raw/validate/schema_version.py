@@ -16,3 +16,20 @@ class EventoSchema_V1(BaseModel):
     produto_id: Optional[int] = None
     quantidade: Optional[int] = None
     valor_unitario: Optional[float] = None
+
+class ProductSchema_V1(BaseModel):
+
+    id: int
+    nome: str
+    valor: float
+
+class StoreSchema_V1(BaseModel):
+    
+    ID: int
+    CNPJ: str
+    Endereço: str
+    Bairro: str
+    Cidade: str
+    Estado: str
+    Gerente: str
+    Horário_de_Atendimento: str
