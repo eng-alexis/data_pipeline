@@ -1,2 +1,2 @@
-ID,CNPJ,Endereço,Bairro,Cidade,Estado,Gerente,Horário de Atendimento
+ID,CNPJ,Endereço,Bairro,Cidade,Estado,Gerente,Horário_de_Atendimento
 1,12.345.678/0001-01,Av. Paulista 1500,Bela Vista,São Paulo,SP,Carlos Silva,08:00 - 22:00

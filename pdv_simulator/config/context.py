@@ -1,3 +1,11 @@
+import pandas as pd
+
+inicio = '2026-01-01' 
+fim    = '2026-01-07'
+
+# Gera o range de datas diretamente
+DATA = pd.date_range(start=inicio, end=fim).strftime('%Y-%m-%d').tolist()
+
 LOJAS = [1]
 
 CAIXAS_POR_LOJA = {
