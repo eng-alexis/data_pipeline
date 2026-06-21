@@ -1,5 +1,5 @@
 
-from pipeline.src.silver.load.load_to_silver import get_ultimo_id, load_to_silver
+from pipeline.src.silver.load.load_to_silver import get_ultimo_id, load_to_silver, descobrir_script_sql
 
 from pipeline.common.context.pipeline_context import upd_watermark_exec, upd_watermark_layer
 from pipeline.common.database.conx_database import get_db_connection
@@ -7,11 +7,9 @@ from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 
-from pipeline.config.paths import SQL_SCRIPT_LOAD
-
 from datetime import datetime
 
-def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
+def etapa_silver(id_execution, id_arquivo, inicio_pipeline, entidade):
 
     try:
         conexao_db = get_db_connection()
@@ -20,26 +18,40 @@ def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
 
         # Carrega dados RAW -> SILVER
 
-        sql_path = SQL_SCRIPT_LOAD
+        sql_path = descobrir_script_sql(entidade)
+        
+        #nome_entidade = entidade
+        watermark_name = f"raw.eventos_last_id"
+        entidade_raw = f"raw.{entidade}"
 
-        ultimo_id = get_ultimo_id(conexao_db, 'raw.eventos_last_id')
+        print("checkpoint 01")
 
-        load = load_to_silver(conexao_db, ultimo_id, sql_path)
+        ultimo_id = get_ultimo_id(conexao_db, watermark_name)
+
+        print(ultimo_id)
+        print(sql_path)
+
+        load = load_to_silver(conexao_db, ultimo_id, entidade ,sql_path)
+        conexao_db.commit()
 
         linhas_lidas, linhas_gravadas = load
 
+        print(linhas_lidas)
+        print(linhas_gravadas)
+
+        print("checkpoint 02")
         # Atualiza id_contexto
 
         fim = datetime.now()
         upd_watermark_exec(conexao_db, id_exec, fim)
+        print("checkpoint 021")
 
         # Atualiza o ultimo id da entidade raw (que já foi processado para silver)
 
-        watermark = 'raw.eventos_last_id'
         fim = datetime.now()
 
-        upd_watermark_layer(conexao_db, 'raw.eventos', watermark, fim)
-
+        upd_watermark_layer(conexao_db, entidade_raw, watermark_name, fim)
+        print("checkpoint 022")
         # Atualizar execução do pipeline
 
         fim = datetime.now()
@@ -47,18 +59,18 @@ def etapa_silver(id_execution, id_arquivo, inicio_pipeline):
         msg = ''
 
         update_execution(conexao_db, id_exec, fim, status, msg)
-
+        print("checkpoint 03")
         # Registra e Atualiza step silver
 
         camada = 'SILVER'
-        entidade = 'silver.eventos'
+        entidade_silver = f'silver.{entidade}'
         fim = datetime.now()
 
         diferenca = (fim - inicio_pipeline)
         duracao = diferenca.total_seconds()
         
-        reg_new_step(conexao_db, id_exec, id_arquivo, camada, entidade, linhas_lidas, linhas_gravadas, inicio_step, fim, duracao)
-
+        reg_new_step(conexao_db, id_exec, id_arquivo, camada, entidade_silver, linhas_lidas, linhas_gravadas, inicio_step, fim, duracao)
+        print("checkpoint 04")
         return True
 
     except Exception as e:

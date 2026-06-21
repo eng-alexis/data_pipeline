@@ -1,6 +1,6 @@
 MERGE INTO silver.eventos s USING(
             SELECT
-            (dados->>'event_id')::UUID AS evento_id,
+            (dados->>'event_id')::UUID AS id_evento,
             (dados->>'event_time')::TIMESTAMP AS evento_time,
             (dados->>'emit_time')::TIMESTAMP AS emit_time,
             (dados->>'tipo_evento')::VARCHAR(20) AS tipo_evento,
@@ -12,6 +12,7 @@ MERGE INTO silver.eventos s USING(
             (dados->>'quantidade')::INTEGER AS quantidade,
             (dados->>'valor_unitario')::NUMERIC(6,2) AS valor_unitario,
             (id_raw)::BIGINT AS id_raw,
+            (entidade)::VARCHAR(20) AS entidade,
             (data_ingestao_raw)::TIMESTAMP AS data_ingestao_raw,
             (schema_status)::VARCHAR(20) AS schema_status,
             (schema_version)::VARCHAR(20) AS schema_version,
@@ -19,14 +20,14 @@ MERGE INTO silver.eventos s USING(
         FROM 
             raw.eventos
         WHERE
-            id_raw > %s AND schema_status = 'VALIDO') r
+            id_raw > %s AND entidade = 'eventos' AND schema_status = 'VALIDO') r
 
-            ON (r.evento_id = s.evento_id)
+            ON (r.id_evento = s.id_evento)
 
         WHEN NOT MATCHED THEN
 
         INSERT(
-            evento_id,
+            id_evento,
             evento_time,
             emit_time,
             tipo_evento,
@@ -41,7 +42,7 @@ MERGE INTO silver.eventos s USING(
             data_ingestao_raw) 
 
         VALUES(
-            r.evento_id,
+            r.id_evento,
             r.evento_time,
             r.emit_time,
             r.tipo_evento,

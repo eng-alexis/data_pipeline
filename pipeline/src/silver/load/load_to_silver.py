@@ -1,5 +1,6 @@
 # Descobrir ultimo id processado (watermark)
 from pipeline.common.database.conx_database import get_db_connection
+from pipeline.config.paths import SQL_LOAD_TO_EVENTOS, SQL_LOAD_TO_LOJAS, SQL_LOAD_TO_PRODUTOS
 
 conx = get_db_connection()
 
@@ -17,21 +18,21 @@ def get_ultimo_id(conection_db, watermark_name):
 
 # Realizar extração
 
-def load_to_silver(conection_db, ultimo_id, script_sql):
+def load_to_silver(conection_db, ultimo_id, entidade, script_sql):
 
     conx = conection_db
     cursor = conx.cursor()
-    id_anterior = ultimo_id
 
     sql_inject_file = script_sql
 
     with open(sql_inject_file,'r', encoding='utf-8') as sql:
         comando = sql.read()
 
-        cursor.execute(comando,(ultimo_id,))
+        cursor.execute(comando, (ultimo_id,))
         linhas_lidas = cursor.rowcount
 
-        linhas_load = """SELECT COUNT(*) FROM silver.eventos
+
+        linhas_load = f"""SELECT COUNT(*) FROM silver.{entidade}
                                 WHERE id_raw > %s;"""
         
         cursor.execute(linhas_load,(ultimo_id,))
@@ -40,3 +41,23 @@ def load_to_silver(conection_db, ultimo_id, script_sql):
         conx.commit()
 
     return linhas_lidas, linhas_gravadas
+
+# Retorna o script sql correto com base na entidade
+
+def descobrir_script_sql(entidade):
+
+    entidade_1 = "eventos"
+    entidade_2 = "produtos"
+    entidade_3 = "lojas"
+
+    if entidade == entidade_1:
+        return SQL_LOAD_TO_EVENTOS
+    
+    elif entidade == entidade_2:
+        return SQL_LOAD_TO_PRODUTOS
+
+    elif entidade == entidade_3:
+        return SQL_LOAD_TO_LOJAS
+
+    else:
+        return print(f"Script sql não encontrado para essa entidade {entidade}")
