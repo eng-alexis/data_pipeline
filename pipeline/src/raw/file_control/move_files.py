@@ -1,4 +1,5 @@
 import shutil
+from pathlib import Path
 
 # Registra novo arquivo no banco
 
@@ -28,7 +29,6 @@ def reg_novo_arquivo(connection_db, hash, nome_arquivo, data_ingestao, tamanho_b
     except Exception as e:
         print(f"Erro ao registrar file: {nome_arquivo} - {e}")
 
-
 # Move arquivos processados
 
 def move_file(arquivo, destino):
@@ -37,3 +37,14 @@ def move_file(arquivo, destino):
     
     return True
 
+# Deleta diretorios vazios
+
+def delete_empty_dir(arquivo):
+
+    file_dir = Path(arquivo).resolve().parent
+
+    try:
+        file_dir.rmdir()
+
+    except Exception as e:
+        print(f"erro: {e}")
