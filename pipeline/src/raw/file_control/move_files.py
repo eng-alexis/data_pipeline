@@ -41,10 +41,10 @@ def move_file(arquivo, destino):
 
 def delete_empty_dir(arquivo):
 
-    file_dir = Path(arquivo).resolve().parent
-
     try:
+
+        file_dir = Path(arquivo).resolve().parent
         file_dir.rmdir()
 
-    except Exception as e:
-        print(f"erro: {e}")
+    except OSError:
+        pass

@@ -3,6 +3,10 @@ from pdv_simulator.src.sales_day_simulatior import day_simulation
 from pdv_simulator.config.paths import PDV_ROOT
 from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA
 
+contador = 0
+
+print("pdv_simulator iniciado")
+
 for data in DATA:
 
     for loja in LOJAS:
@@ -18,6 +22,8 @@ for data in DATA:
                 eventos_path.parent.mkdir(parents=True, exist_ok=True)
 
                 salvar_json(simulacao, eventos_path)
+                
+            contador += 1
 
         produtos = raiz / "database" / "catalogo.json"
         produtos.parent.mkdir(parents=True, exist_ok=True)
@@ -27,3 +33,5 @@ for data in DATA:
 
         export_catalogo(produtos)
         export_lojas(lojas)
+
+print(f"{contador} arquivo(s) gerados pelo pdv_simulator")

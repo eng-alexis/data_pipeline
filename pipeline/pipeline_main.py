@@ -11,21 +11,25 @@ path_padrão = JSON_EVENTS_DIR
 
 tipos_esperados = ["jsonl", "json"]
 
+print("Pipeline Iniciado")
+
 for tipo in tipos_esperados:
 
     arquivos_encontrados = encontrar_arquivos(path_padrão, tipo)
+
+    arquivos_raw = 0
+    arquivos_silver = 0
 
     for arquivo in arquivos_encontrados:
 
         try:
             id_exec = gerar_id_contexto(conx)
-            print(F"Pipeline id n° {id_exec} iniciado")
 
             sucesso = etapa_raw(id_exec, arquivo)
 
-            if sucesso:
+            arquivos_raw += 1
 
-                print("1/2 - Etapa raw comcluida")
+            if sucesso:
 
                 arquivo, inicio, entidade = sucesso
 
@@ -33,10 +37,9 @@ for tipo in tipos_esperados:
 
                 if sucesso2:
 
-                    print("2/2 - Etapa silver concluida")
-
-                    print("Pipeline Concluido")
-                    print("------------------")
+                    arquivos_silver += 1
 
         except Exception as e:
             print(f"Erro: {e}")
+
+print("Pipeline Concluido")

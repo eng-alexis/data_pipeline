@@ -1,7 +1,7 @@
 import pandas as pd
 
-inicio = '2026-01-01' 
-fim    = '2026-01-07'
+inicio = '2026-01-09' 
+fim    = '2026-01-11'
 
 # Gera o range de datas diretamente
 DATA = pd.date_range(start=inicio, end=fim).strftime('%Y-%m-%d').tolist()
