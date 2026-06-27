@@ -149,7 +149,7 @@ def etapa_raw(id_execution, json_file):
                         
                     # Carrega lote na tabela raw.
 
-                    if lote == tam_lote:
+                    if len(lote) == tam_lote:
                         
                         load = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
                         conexao_bd.commit()

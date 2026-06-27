@@ -12,7 +12,6 @@ MERGE INTO silver.lojas s USING(
             (data_ingestao_raw)::TIMESTAMP AS data_ingestao_raw,
             (entidade)::VARCHAR(20) AS entidade,
             (schema_status)::VARCHAR(20) AS schema_status
-
         FROM 
             raw.eventos
         WHERE

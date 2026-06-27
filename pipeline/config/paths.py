@@ -19,3 +19,7 @@ JSON_DUPLICATE_DIR.mkdir(parents=True, exist_ok=True)
 SQL_LOAD_TO_EVENTOS  = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_eventos.sql"
 SQL_LOAD_TO_PRODUTOS = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_produtos.sql"
 SQL_LOAD_TO_LOJAS    = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_lojas.sql"
+
+SQL_LOAD_TO_FATO_VENDAS  = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_fato_vendas.sql"
+SQL_LOAD_TO_DIM_PRODUTOS = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_dim_produtos.sql"
+SQL_LOAD_TO_DIM_LOJAS    = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_dim_lojas.sql"
