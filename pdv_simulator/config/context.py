@@ -1,7 +1,7 @@
 import pandas as pd
 
-inicio = '2026-01-21' 
-fim    = '2026-01-22'
+inicio = '' # ex('2026-01-01')
+fim    = '' # ex('2026-01-02')
 
 # Gera o range de datas diretamente
 DATA = pd.date_range(start=inicio, end=fim).strftime('%Y-%m-%d').tolist()
@@ -19,7 +19,7 @@ PERFIL_HORA = {
     11: 40,
     12: 60,
     13: 50,
-    14: 30,
+    14: 30, 
     15: 25,
     16: 30,
     17: 40,

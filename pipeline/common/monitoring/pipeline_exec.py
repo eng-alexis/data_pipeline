@@ -30,3 +30,4 @@ def update_execution(connection_db, id_exec_atual, fim, status, mensagem):
     valores = (fim, status, mensagem, id_exec_atual)
 
     cursor.execute(query, valores)
+    conx.commit()
