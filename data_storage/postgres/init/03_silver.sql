@@ -1,6 +1,7 @@
 -- Tabela silver.eventos
 
 CREATE TABLE IF NOT EXISTS silver.eventos(
+    id_silver   BIGSERIAL,
     id_evento   UUID,
     evento_time TIMESTAMP,
     emit_time   TIMESTAMP,
