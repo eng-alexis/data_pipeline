@@ -3,7 +3,6 @@
 from pipeline.src.silver.load.load_to_silver import get_ultimo_id, load_to_silver, descobrir_script_sql
 from pipeline.common.context.pipeline_context import upd_watermark_exec, upd_watermark_layer
 from pipeline.common.database.conx_database import get_db_connection
-from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 
 from datetime import datetime
@@ -36,14 +35,6 @@ def etapa_silver(id_execution, id_arquivo, inicio_pipeline, entidade):
         fim = datetime.now()
 
         upd_watermark_layer(conexao_db, watermark_name, fim)
-
-        # Atualizar id de execução do pipeline
-
-        fim = datetime.now()
-        status = 'SUCESSO'
-        msg = ''
-
-        update_execution(conexao_db, id_exec, fim, status, msg)
 
         # Registra e Atualiza step silver
 

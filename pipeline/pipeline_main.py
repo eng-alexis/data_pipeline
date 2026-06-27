@@ -1,5 +1,6 @@
 from pipeline.src.raw.raw_main import etapa_raw
 from pipeline.src.silver.silver_main import etapa_silver
+from pipeline.src.gold.gold_main import etapa_gold
 from pipeline.common.context.pipeline_context import gerar_id_contexto
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos
@@ -17,17 +18,12 @@ for tipo in tipos_esperados:
 
     arquivos_encontrados = encontrar_arquivos(path_padrão, tipo)
 
-    arquivos_raw = 0
-    arquivos_silver = 0
-
     for arquivo in arquivos_encontrados:
 
         try:
             id_exec = gerar_id_contexto(conx)
 
             sucesso = etapa_raw(id_exec, arquivo)
-
-            arquivos_raw += 1
 
             if sucesso:
 
@@ -37,7 +33,7 @@ for tipo in tipos_esperados:
 
                 if sucesso2:
 
-                    arquivos_silver += 1
+                    etapa_gold(id_exec, arquivo, entidade)     
 
         except Exception as e:
             print(f"Erro: {e}")
