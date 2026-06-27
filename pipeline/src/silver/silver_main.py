@@ -9,45 +9,41 @@ from datetime import datetime
 
 def etapa_silver(id_execution, id_arquivo, inicio_pipeline, entidade):
 
-    try:
-        conexao_db = get_db_connection()
-        id_exec = id_execution
-        inicio_step = datetime.now()
+    conexao_db = get_db_connection()
+    id_exec = id_execution
+    inicio_step = datetime.now()
 
-        # Carrega dados RAW -> SILVER
+    # Carrega dados RAW -> SILVER
 
-        sql_load_script = descobrir_script_sql(entidade)
-        
-        watermark_name = "raw.eventos_last_id"
+    sql_load_script = descobrir_script_sql(entidade)
+    
+    watermark_name = "raw.eventos_last_id"
 
-        ultimo_id = get_ultimo_id(conexao_db, watermark_name)
+    ultimo_id = get_ultimo_id(conexao_db, watermark_name)
 
-        load = load_to_silver(conexao_db, ultimo_id, entidade ,sql_load_script)
-        conexao_db.commit()
+    load = load_to_silver(conexao_db, ultimo_id, entidade ,sql_load_script)
+    conexao_db.commit()
 
-        # Atualiza id_contexto
+    # Atualiza id_contexto
 
-        fim = datetime.now()
-        upd_watermark_exec(conexao_db, id_exec, fim)
+    fim = datetime.now()
+    upd_watermark_exec(conexao_db, id_exec, fim)
 
-        # Atualiza ultimo id da entidade raw (que já foi processado pela etapa silver)
+    # Atualiza ultimo id da entidade raw (que já foi processado pela etapa silver)
 
-        fim = datetime.now()
+    fim = datetime.now()
 
-        upd_watermark_layer(conexao_db, watermark_name, fim)
+    upd_watermark_layer(conexao_db, watermark_name, fim)
 
-        # Registra e Atualiza step silver
+    # Registra e Atualiza step silver
 
-        camada = 'SILVER'
-        entidade_silver = f'silver.{entidade}'
-        linhas_lidas, linhas_gravadas = load
-        fim = datetime.now()
-        diferenca = (fim - inicio_pipeline)
-        duracao = diferenca.total_seconds()
-        
-        reg_new_step(conexao_db, id_exec, id_arquivo, camada, entidade_silver, linhas_lidas, linhas_gravadas, inicio_step, fim, duracao)
-        
-        return True
-
-    except Exception as e:
-        print(f"Erro na etapa silver: {e}")
+    camada = 'SILVER'
+    entidade_silver = f'silver.{entidade}'
+    linhas_lidas, linhas_gravadas = load
+    fim = datetime.now()
+    diferenca = (fim - inicio_pipeline)
+    duracao = diferenca.total_seconds()
+    
+    reg_new_step(conexao_db, id_exec, id_arquivo, camada, entidade_silver, linhas_lidas, linhas_gravadas, inicio_step, fim, duracao)
+    
+    return True

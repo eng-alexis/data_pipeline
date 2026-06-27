@@ -5,35 +5,24 @@ from pipeline.src.gold.load.load_to_gold import get_ultimo_id, find_script_sql, 
 
 from datetime import datetime
 
-def etapa_gold(id_exec, id_arquivo, entidade):
+def etapa_gold(id_execucao, id_arquivo, entidade):
     
-    try:
+    inicio = datetime.now()
 
-        inicio = datetime.now()
+    conexao = get_db_connection()
 
-        conexao = get_db_connection()
+    script = find_script_sql(entidade)
 
-        script = find_script_sql(entidade)
+    ultimo_id = get_ultimo_id(conexao)
 
-        ultimo_id = get_ultimo_id(conexao)
+    linhas_lidas, linhas_gravadas = load_to_gold(conexao, script, ultimo_id)
 
-        linhas_lidas, linhas_gravadas = load_to_gold(conexao, script, ultimo_id)
+    fim = datetime.now()
+    diferenca = (fim - inicio)
+    duracao = diferenca.total_seconds()
 
-        fim = datetime.now()
-        diferenca = (fim - inicio)
-        duracao = diferenca.total_seconds()
+    upd_watermark(conexao)
 
-        upd_watermark(conexao)
+    reg_new_step(conexao, id_execucao, id_arquivo, 'GOLD', entidade, linhas_lidas, linhas_gravadas, inicio, fim, duracao)
 
-        fim = datetime.now()
-        status = 'SUCESSO'
-        msg = ''
-
-        update_execution(conexao, id_exec, fim, status, msg)
-
-        reg_new_step(conexao, id_exec, id_arquivo, 'GOLD', entidade, linhas_lidas, linhas_gravadas, inicio, fim, duracao)
-
-        return True
-
-    except Exception as e:
-        print(f"Erro na etapa gold: {e}")
+    return True
