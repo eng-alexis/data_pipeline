@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS gold.fato_vendas(
     id_silver BIGINT,
     data DATE,
     hora TIME,
+    inicio_hora TIME,
     id_loja INT,
     id_caixa INT,
     id_pedido BIGINT,
@@ -24,4 +25,16 @@ CREATE TABLE IF NOT EXISTS gold.dim_lojas(
     cidade VARCHAR(30), 
     estado VARCHAR(30),
     gerente VARCHAR(60)
+);
+
+CREATE TABLE IF NOT EXISTS gold.dim_calendario(
+    data DATE,
+    ano INT,
+    semestre INT,
+    trimestre INT,
+    mes VARCHAR(2),
+    mes_abreviado VARCHAR(3),
+    mes_nome VARCHAR(15),
+    dia INT,
+    dia_nome VARCHAR(15)
 );
