@@ -23,3 +23,4 @@ SQL_LOAD_TO_LOJAS    = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load
 SQL_LOAD_TO_FATO_VENDAS  = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_fato_vendas.sql"
 SQL_LOAD_TO_DIM_PRODUTOS = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_dim_produtos.sql"
 SQL_LOAD_TO_DIM_LOJAS    = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_dim_lojas.sql"
+SQL_LOAD_TO_DIM_CALENDARIO = PIPELINE_ROOT / "src" / "gold" / "load" / "sql" / "load_to_dim_calendario.sql"

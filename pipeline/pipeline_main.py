@@ -1,6 +1,6 @@
 from pipeline.src.raw.raw_main import etapa_raw
 from pipeline.src.silver.silver_main import etapa_silver
-from pipeline.src.gold.gold_main import etapa_gold
+from pipeline.src.gold.gold_main import etapa_gold, etapa_gold_calendario
 from pipeline.common.context.pipeline_context import gerar_id_contexto
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos
@@ -24,39 +24,34 @@ for tipo in tipos_esperados:
 
         for arquivo in arquivos_encontrados:
 
-            inicio_secao = datetime.now()
+            inicio_pipeline = datetime.now()
 
             id_exec = gerar_id_contexto(conx)
             entidade = descobrir_entidade(arquivo)
 
             if entidade != "eventos":
-                 
-                 arquivo = rename_file(arquivo, inicio_secao)
-                 print(arquivo)
-            
+
+                 arquivo = rename_file(arquivo, inicio_pipeline)
             else:
                  arquivo
                  
             try:
  
-                etapa_1 = etapa_raw(id_exec, inicio_secao, arquivo, entidade)
+                etapa_1 = etapa_raw(id_exec, inicio_pipeline, arquivo, entidade)
+                etapa_2 = etapa_silver(id_exec, etapa_1, inicio_pipeline, entidade)
+                etapa_3 = etapa_gold_calendario(id_exec, etapa_1)
+                etapa_4 = etapa_gold(id_exec, etapa_1, entidade)
 
-                etapa_2 = etapa_silver(id_exec, etapa_1, inicio_secao, entidade)
-                
-                etapa_3 = etapa_gold(id_exec, etapa_1, entidade)
+                fim_pipeline = datetime.now()
 
-                fim = datetime.now()
-
-                update_execution(conx, id_exec, fim, 'SUCESSO', ' ')
+                update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', None)
 
             except Exception as e:
 
-                fim = datetime.now()
+                fim_pipeline = datetime.now()
                 msg = f"{type(e).__name__}"
-                update_execution(conx, id_exec, fim, 'ERRO', msg )
+                update_execution(conx, id_exec, fim_pipeline, 'ERRO', msg )
 
                 print(f"Erro: {e}")
              
 print("Pipeline Concluido")
-
-
