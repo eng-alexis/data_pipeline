@@ -37,3 +37,23 @@ def extrair_registros(arquivo, tipo_file):
 
         else:
             print("Tipo de arquivo não é permitido")
+
+# descobre a entidade com base no nome do arquivo
+
+def descobrir_entidade(arquivo):
+
+    entidade_1 = "catalogo"
+    entidade_2 = "lojas"
+    entidade_3 = "eventos"
+
+    if entidade_1 in arquivo.name:
+        return "produtos"
+    
+    elif entidade_2 in arquivo.name:
+        return entidade_2
+    
+    elif "20" in arquivo.name:
+        return entidade_3
+    
+    else:
+        return print("entidade não identificada")

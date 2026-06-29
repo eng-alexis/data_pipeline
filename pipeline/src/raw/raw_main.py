@@ -1,11 +1,10 @@
-# Importa modulos
-
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 from pipeline.common.context.pipeline_context import upd_watermark_exec
+
+from pipeline.src.raw.extract.extract_json import extrair_registros, descobrir_entidade
 from pipeline.src.raw.validate.schema_validate import schema_event_validation, schema_product_validation, schema_store_validation
-from pipeline.src.raw.extract.extract_json import extrair_registros
 from pipeline.src.raw.file_control.hash import gerar_hash, find_hash
 from pipeline.src.raw.file_control.manipulate_file import rename_file, move_file, delete_empty_dir
 from pipeline.src.raw.file_control.register_file import reg_new_file
@@ -25,7 +24,7 @@ path_duplicado  = JSON_DUPLICATE_DIR
 
 conexao_bd = get_db_connection()
 
-def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
+def etapa_raw(id_execution, inicio_pipeline, json_file):
 
     # Inicia Pipeline
 
@@ -67,6 +66,8 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
     else:
 
         # Descobre a entidade
+
+        entidade = descobrir_entidade(arquivo)
 
         TABELAS_RAW = {"eventos","produtos","lojas"}
 
@@ -182,4 +183,4 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
                     reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
                     conexao_bd.commit()
 
-                    return id_arquivo, nome_arquivo, hash_arquivo
+                    return id_arquivo, nome_arquivo, hash_arquivo, entidade
