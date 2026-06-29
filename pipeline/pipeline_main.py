@@ -4,7 +4,7 @@ from pipeline.src.gold.gold_main import etapa_gold, etapa_gold_calendario
 
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos
 from pipeline.common.database.conx_database import get_db_connection
-from pipeline.common.context.pipeline_context import gerar_id_contexto
+from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution
 
@@ -35,11 +35,11 @@ for tipo in tipos_esperados:
 
             try:
  
-                etapa_1 = etapa_raw(id_exec, inicio_pipeline, arquivo)
+                etapa_1 = etapa_raw(id_exec, arquivo)
 
                 id_arquivo, nome_arquivo, hash_arquivo, entidade = etapa_1
 
-                etapa_2 = etapa_silver(id_exec, id_arquivo, inicio_pipeline, entidade)
+                etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
                 etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
                 etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
 
@@ -47,6 +47,8 @@ for tipo in tipos_esperados:
 
                 update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', arquivo=nome_arquivo, 
                                  hash=hash_arquivo)
+                           
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
 
             except Exception as e:
 

@@ -1,49 +1,30 @@
-# Importa modulos
-
-from pipeline.src.silver.load.load_to_silver import get_ultimo_id, load_to_silver, descobrir_script_sql
-from pipeline.common.context.pipeline_context import upd_watermark_exec, upd_watermark_layer
+from pipeline.src.silver.load.load_to_silver import load_to_silver
+from pipeline.common.database.find_load_script import find_script_sql
+from pipeline.common.context.pipeline_context import get_ultimo_id, upd_watermark_layer
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 
 from datetime import datetime
 
-def etapa_silver(id_execution, id_arquivo, inicio_pipeline, entidade):
+# Carrega registros nas tabelas do schema silver
 
-    conexao_db = get_db_connection()
-    id_exec = id_execution
+def etapa_silver(id_execution, id_arquivo, entidade):
+
     inicio_step = datetime.now()
-
-    # Carrega dados RAW -> SILVER
-
-    sql_load_script = descobrir_script_sql(entidade)
-    
+    conexao_db = get_db_connection()
+    sql_load_script = find_script_sql(entidade, "silver")
     watermark_name = "raw.eventos_last_id"
-
-    ultimo_id = get_ultimo_id(conexao_db, watermark_name)
-
-    load = load_to_silver(conexao_db, ultimo_id, entidade ,sql_load_script)
-    conexao_db.commit()
-
-    # Atualiza id_contexto
-
-    fim = datetime.now()
-    upd_watermark_exec(conexao_db, id_exec, fim)
-
-    # Atualiza ultimo id da entidade raw (que já foi processado pela etapa silver)
-
-    fim = datetime.now()
-
-    upd_watermark_layer(conexao_db, watermark_name, fim)
-
-    # Registra e Atualiza step silver
-
-    camada = 'SILVER'
+    last_id_raw = get_ultimo_id(conexao_db, watermark_name)
+    linhas_lidas, linhas_gravadas = load_to_silver(conexao_db, last_id_raw, entidade,
+                                                   sql_load_script)
     entidade_silver = f'silver.{entidade}'
-    linhas_lidas, linhas_gravadas = load
-    fim = datetime.now()
-    diferenca = (fim - inicio_pipeline)
+
+    fim_step = datetime.now()
+    diferenca = (fim_step - inicio_step)
     duracao = diferenca.total_seconds()
-    
-    reg_new_step(conexao_db, id_exec, id_arquivo, camada, entidade_silver, linhas_lidas, linhas_gravadas, inicio_step, fim, duracao)
+
+    upd_watermark_layer(conexao_db, "id_raw", "raw.eventos", watermark_name, fim_step)
+    reg_new_step(conexao_db, id_execution, id_arquivo, 'Silver', entidade_silver, linhas_lidas,
+                  linhas_gravadas, inicio_step, fim_step, duracao)
     
     return True
