@@ -6,7 +6,7 @@ from pipeline.common.database.conx_database import get_db_connection
 from pipeline.src.raw.extract.extract_json import encontrar_arquivos
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.src.raw.load.load_raw import descobrir_entidade
-from pipeline.src.raw.file_control.move_files import rename_file
+from pipeline.common.monitoring.pipeline_exec import reg_new_execution
 from pipeline.config.paths import JSON_EVENTS_DIR
 from datetime import datetime
 
@@ -29,23 +29,32 @@ for tipo in tipos_esperados:
             id_exec = gerar_id_contexto(conx)
             entidade = descobrir_entidade(arquivo)
             
+            # Registra nova execução do pipeline na tabela de auditoria
+
+            reg_new_execution(conx, id_exec, inicio_pipeline)
+            conx.commit()
+
             try:
  
                 etapa_1 = etapa_raw(id_exec, inicio_pipeline, arquivo, entidade)
-                etapa_2 = etapa_silver(id_exec, etapa_1, inicio_pipeline, entidade)
-                etapa_3 = etapa_gold_calendario(id_exec, etapa_1)
-                etapa_4 = etapa_gold(id_exec, etapa_1, entidade)
+
+                id_arquivo, nome_arquivo, hash_arquivo = etapa_1
+
+                etapa_2 = etapa_silver(id_exec, id_arquivo, inicio_pipeline, entidade)
+                etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
+                etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
 
                 fim_pipeline = datetime.now()
 
-                update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', None)
+                update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', arquivo=nome_arquivo, 
+                                 hash=hash_arquivo)
 
             except Exception as e:
 
                 fim_pipeline = datetime.now()
                 msg = f"{type(e).__name__}"
-                update_execution(conx, id_exec, fim_pipeline, 'ERRO', msg )
 
+                update_execution(conx, id_exec, fim_pipeline, 'ERRO', mensagem=msg )
                 print(f"Erro: {e}")
              
 print("Pipeline Concluido")

@@ -1,6 +1,6 @@
 # Registra novo arquivo no banco
 
-def reg_novo_arquivo(connection_db, hash, nome_arquivo, data_ingestao, tamanho_bytes, id_exec):
+def reg_new_file(connection_db, hash, nome_arquivo, data_ingestao, tamanho_bytes, id_exec):
 
     conx = connection_db
 

@@ -1,14 +1,15 @@
 # Importa modulos
 
 from pipeline.common.database.conx_database import get_db_connection
-from pipeline.common.monitoring.pipeline_exec import reg_new_execution, update_execution
+from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 from pipeline.common.context.pipeline_context import upd_watermark_exec
 from pipeline.src.raw.validate.schema_validate import schema_event_validation, schema_product_validation, schema_store_validation
 from pipeline.src.raw.extract.extract_json import extrair_registros
-from pipeline.src.raw.file_control.search_file_hist import gerar_hash, find_hash
-from pipeline.src.raw.file_control.move_files import reg_novo_arquivo, rename_file, move_file, delete_empty_dir
-from pipeline.src.raw.load.load_raw import load_to_raw, load_to_quarentine, descobrir_entidade
+from pipeline.src.raw.file_control.hash import gerar_hash, find_hash
+from pipeline.src.raw.file_control.manipulate_file import rename_file, move_file, delete_empty_dir
+from pipeline.src.raw.file_control.register_file import reg_new_file
+from pipeline.src.raw.load.load_raw import load_to_raw, load_to_quarentine
 
 from pipeline.config.paths import JSON_PROCESSED_DIR, JSON_DUPLICATE_DIR
 
@@ -43,11 +44,6 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
     nome_arquivo    = Path(arquivo).name
     tamanho_bytes   = arquivo.stat().st_size
 
-    # Registra nova execução do pipeline na tabela de auditoria
-
-    new_exec = reg_new_execution(conexao_bd, id_exec, inicio_pipeline, nome_arquivo, hash_arquivo)
-    conexao_bd.commit()
-
     # Valida arquivo
 
     sh_file  = find_hash(conexao_bd, hash_arquivo)
@@ -58,7 +54,7 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
 
         fim = datetime.now()
 
-        upd_exec    = update_execution(conexao_bd, id_exec, fim, "DUPLICADO", "Hash já processado anteriormente")
+        upd_exec    = update_execution(conexao_bd, id_exec, fim, "DUPLICADO", mensagem="Hash já processado anteriormente")
         upd_id_exec = upd_watermark_exec(conexao_bd, id_exec, fim)
         conexao_bd.commit()
 
@@ -72,7 +68,7 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
 
         data_ingestao = datetime.now()
         
-        id_arquivo = reg_novo_arquivo(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
+        id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
         conexao_bd.commit()
 
         if id_arquivo:
@@ -184,4 +180,4 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
                         reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
                         conexao_bd.commit()
 
-                        return id_arquivo
+                        return id_arquivo, nome_arquivo, hash_arquivo
