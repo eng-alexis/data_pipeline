@@ -11,7 +11,7 @@ def gerar_hash(caminho_arquivo):
 
     return sha256.hexdigest()
 
-# Procurar hash e nome do arquivo no banco
+# Encontrar hash na tabela de auditoria (audit.file_history)
 
 def find_hash(connection_db, hash):
 
