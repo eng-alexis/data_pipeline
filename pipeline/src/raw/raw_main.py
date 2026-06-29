@@ -66,118 +66,120 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
 
     else:
 
-        data_ingestao = datetime.now()
+        # Descobre a entidade
+
+        TABELAS_RAW = {"eventos","produtos","lojas"}
+
+        if entidade not in TABELAS_RAW:
+            raise ValueError(f"Entidade inválida: {entidade}")
+
+        # Extrai registros e cria Lote.
         
-        id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
-        conexao_bd.commit()
+        if entidade == "eventos":
+            tipo_file = "jsonl"
 
-        if id_arquivo:
+        else:
+            tipo_file = "json"
+
+        registros = extrair_registros(arquivo, tipo_file)
+
+        lote = []
+        tam_lote = 1000
+        linhas_lidas = 0
+        linhas_gravadas = 0
+
+        # Verifica schema e faz o load na entidade
+        
+        for linha in registros:
             
-            # Descobre a entidade
+            linhas_lidas += 1
 
-            TABELAS_RAW = {"eventos","produtos","lojas"}
+            # Define schema_validation com base na entidade
 
-            if entidade not in TABELAS_RAW:
-                raise ValueError(f"Entidade inválida: {entidade}")
+            try:
 
-            # Extrai registros e cria Lote.
-            
-            if entidade == "eventos":
-                tipo_file = "jsonl"
+                if entidade == "eventos":
+
+                    nome, status, motivo = schema_event_validation(linha)
+
+                elif entidade == "produtos":
+
+                    nome, status, motivo = schema_product_validation(linha)
+
+                elif entidade == "lojas":
+
+                    nome, status, motivo = schema_store_validation(linha)
+
+            except Exception as e:
+
+                print(f"erro: {e}")
+
+            # Verifica status do schema_validation
+    
+            if not status == "VALIDO":                  
+
+                load_to_quarentine(
+                    conexao_bd,
+                    nome_arquivo,
+                    linha,
+                    entidade,
+                    nome,
+                    status,
+                    motivo
+                )
+
+                nome_entidade = f"raw.{entidade}"
+                load_to_raw(conexao_bd, nome_arquivo, [linha], nome_entidade, nome, 'INVALIDO', 'quarentena')
+                conexao_bd.commit()
 
             else:
-                tipo_file = "json"
 
-            registros = extrair_registros(arquivo, tipo_file)
-
-            lote = []
-            tam_lote = 1000
-            linhas_lidas = 0
-            linhas_gravadas = 0
-
-            # Verifica schema e faz o load na entidade
-            
-            for linha in registros:
+                lote.append(linha)
                 
-                linhas_lidas += 1
+            # Carrega lote na tabela raw.
 
-                # Define schema_validation com base na entidade
-
-                try:
-
-                    if entidade == "eventos":
-
-                        nome, status, motivo = schema_event_validation(linha)
-
-                    elif entidade == "produtos":
-
-                        nome, status, motivo = schema_product_validation(linha)
-
-                    elif entidade == "lojas":
-
-                        nome, status, motivo = schema_store_validation(linha)
-
-                except Exception as e:
-
-                    print(f"erro: {e}")
-
-                # Verifica status do schema_validation
-        
-                if not status == "VALIDO":                  
-
-                    load_to_quarentine(
-                        conexao_bd,
-                        nome_arquivo,
-                        linha,
-                        entidade,
-                        nome,
-                        status,
-                        motivo
-                    )
-
-                    nome_entidade = f"raw.{entidade}"
-                    load_to_raw(conexao_bd, nome_arquivo, [linha], nome_entidade, nome, 'INVALIDO', 'quarentena')
-                    conexao_bd.commit()
-
-                else:
-
-                    lote.append(linha)
-                    
-                # Carrega lote na tabela raw.
-
-                if len(lote) == tam_lote:
-                    
-                    load = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
-                    conexao_bd.commit()
-                    linhas_gravadas += len(lote)                            
-                    lote.clear()
-
-            load_2 = False
-
-            if lote:
-
-                load_2 = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
+            if len(lote) == tam_lote:
+                
+                load = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
                 conexao_bd.commit()
-                linhas_gravadas += len(lote)
-                
+                linhas_gravadas += len(lote)                            
                 lote.clear()
 
-            if load_2:
+        load_2 = False
+
+        if lote:
+
+            load_2 = load_to_raw(conexao_bd, nome_arquivo, lote, entidade, nome, 'VALIDO', None)
+            conexao_bd.commit()
+            linhas_gravadas += len(lote)
+            
+            lote.clear()
+
+        if load_2:
+                
+            # Registra arquivo na tabela de auditoria (audit.file_history)
+
+            data_ingestao = datetime.now()
         
-                # Move arquivos processados e finaliza a etapa de ingestão.
- 
-                    move = move_file(arquivo, path_processado)
+            id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
+            conexao_bd.commit()
 
-                    if move:
-                        
-                        delete_empty_dir(arquivo)
-                        fim = datetime.now()
-                        diferenca = (fim - inicio_pipeline)
-                        duracao   = diferenca.total_seconds()
+        if id_arquivo:
+    
+            # Move arquivos processados e finaliza a etapa de ingestão.
 
-                        # Atualiza tabela audit.pipeline_step
+                move = move_file(arquivo, path_processado)
 
-                        reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
-                        conexao_bd.commit()
+                if move:
+                    
+                    delete_empty_dir(arquivo)
+                    fim = datetime.now()
+                    diferenca = (fim - inicio_pipeline)
+                    duracao   = diferenca.total_seconds()
 
-                        return id_arquivo, nome_arquivo, hash_arquivo
+                    # Atualiza tabela audit.pipeline_step
+
+                    reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
+                    conexao_bd.commit()
+
+                    return id_arquivo, nome_arquivo, hash_arquivo
