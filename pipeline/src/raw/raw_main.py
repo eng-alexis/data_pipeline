@@ -2,7 +2,6 @@ from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_step import reg_new_step
 from pipeline.common.context.pipeline_context import upd_watermark_exec
-
 from pipeline.src.raw.extract.extract_json import extrair_registros, descobrir_entidade
 from pipeline.src.raw.validate.schema_validate import schema_event_validation, schema_product_validation, schema_store_validation
 from pipeline.src.raw.file_control.hash import gerar_hash, find_hash
@@ -24,18 +23,21 @@ path_duplicado  = JSON_DUPLICATE_DIR
 
 conexao_bd = get_db_connection()
 
-def etapa_raw(id_execution, inicio_pipeline, json_file):
+def etapa_raw(id_execution, json_file):
 
     # Inicia Pipeline
 
+    inicio_step = datetime.now()
+
     id_exec = id_execution
     arquivo = json_file
+    entidade = descobrir_entidade(arquivo)
 
     # extrai informações 
     
     if entidade != "eventos":
 
-        arquivo = rename_file(arquivo, inicio_pipeline)
+        arquivo = rename_file(arquivo, inicio_step)
     else:
         arquivo
                  
@@ -51,10 +53,10 @@ def etapa_raw(id_execution, inicio_pipeline, json_file):
 
     if sh_file:
 
-        fim = datetime.now()
+        fim_step = datetime.now()
 
-        upd_exec    = update_execution(conexao_bd, id_exec, fim, "DUPLICADO", mensagem="Hash já processado anteriormente")
-        upd_id_exec = upd_watermark_exec(conexao_bd, id_exec, fim)
+        upd_exec    = update_execution(conexao_bd, id_exec, fim_step, "DUPLICADO", mensagem="Hash já processado anteriormente")
+        upd_id_exec = upd_watermark_exec(conexao_bd, id_exec, fim_step)
         conexao_bd.commit()
 
         # Move arquivo duplicado para pasta arq_duplicados
@@ -66,8 +68,6 @@ def etapa_raw(id_execution, inicio_pipeline, json_file):
     else:
 
         # Descobre a entidade
-
-        entidade = descobrir_entidade(arquivo)
 
         TABELAS_RAW = {"eventos","produtos","lojas"}
 
@@ -164,23 +164,21 @@ def etapa_raw(id_execution, inicio_pipeline, json_file):
         
             id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)
             conexao_bd.commit()
-
-        if id_arquivo:
     
             # Move arquivos processados e finaliza a etapa de ingestão.
 
-                move = move_file(arquivo, path_processado)
+            move = move_file(arquivo, path_processado)
 
-                if move:
-                    
-                    delete_empty_dir(arquivo)
-                    fim = datetime.now()
-                    diferenca = (fim - inicio_pipeline)
-                    duracao   = diferenca.total_seconds()
+            if move:
+                
+                delete_empty_dir(arquivo)
+                fim_step = datetime.now()
+                diferenca = (fim_step - inicio_step)
+                duracao   = diferenca.total_seconds()
 
-                    # Atualiza tabela audit.pipeline_step
+                # Atualiza tabela audit.pipeline_step
 
-                    reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_pipeline, fim, duracao)
-                    conexao_bd.commit()
+                reg_new_step(conexao_bd, id_exec, id_arquivo, 'RAW', entidade, linhas_lidas, linhas_gravadas, inicio_step, fim_step, duracao)
+                conexao_bd.commit()
 
-                    return id_arquivo, nome_arquivo, hash_arquivo, entidade
+                return id_arquivo, nome_arquivo, hash_arquivo, entidade
