@@ -32,7 +32,13 @@ def etapa_raw(id_execution, inicio_pipeline, json_file, entidade):
     arquivo = json_file
 
     # extrai informações 
+    
+    if entidade != "eventos":
 
+        arquivo = rename_file(arquivo, inicio_pipeline)
+    else:
+        arquivo
+                 
     hash_arquivo    = gerar_hash(arquivo)
     nome_arquivo    = Path(arquivo).name
     tamanho_bytes   = arquivo.stat().st_size

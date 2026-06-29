@@ -28,13 +28,7 @@ for tipo in tipos_esperados:
 
             id_exec = gerar_id_contexto(conx)
             entidade = descobrir_entidade(arquivo)
-
-            if entidade != "eventos":
-
-                 arquivo = rename_file(arquivo, inicio_pipeline)
-            else:
-                 arquivo
-                 
+            
             try:
  
                 etapa_1 = etapa_raw(id_exec, inicio_pipeline, arquivo, entidade)
