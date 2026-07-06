@@ -11,7 +11,7 @@ def gerar_id_contexto(conection_db):
     SELECT COALESCE(ultimo_id, 0)
     FROM audit.pipeline_watermark
     WHERE watermark_name = 'context_last_id';
-""")
+    """)
 
     resultado = cursor.fetchone()[0]
 
