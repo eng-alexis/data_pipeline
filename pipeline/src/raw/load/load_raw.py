@@ -18,16 +18,18 @@ def load_to_raw(conx, arquivo, lote, entidade, schema_version, status, obs):
 
             cursor.execute(query,valores)
 
-        conx.commit()
+        #conx.commit()
 
         return True
 
     except Exception as e:
         print(f"Erro ao carregar dados: {e}")
+        return False
 
 # Envia linhas invalidas para raw.quarentena
 
-def load_to_quarentine(conection_db, entidade_arquivo, registro, entidade, schema_version , status, motivo):
+def load_to_quarentine(conection_db, entidade_arquivo, registro, entidade, 
+                       schema_version , status, motivo):
 
     conx = conection_db
     cursor = conx.cursor()
@@ -37,7 +39,8 @@ def load_to_quarentine(conection_db, entidade_arquivo, registro, entidade, schem
                             schema_status, schema_error)
                             VALUES(%s, %s, %s, %s, %s, %s);"""
     
-    valores = (entidade_arquivo, Json(registro), entidade, schema_version, status, motivo)
+    valores = (entidade_arquivo, Json(registro), entidade, schema_version, status, 
+               motivo)
 
     cursor.execute(query,valores)
 
