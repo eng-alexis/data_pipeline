@@ -8,7 +8,7 @@ MERGE INTO silver.eventos s USING(
             (dados->>'id_loja')::INTEGER AS id_loja,
             (dados->>'id_caixa')::INTEGER AS id_caixa,
             (dados->>'id_pedido')::INTEGER AS id_pedido,
-            (dados->>'produto_id')::INTEGER AS produto_id,
+            (dados->>'produto_id')::INTEGER AS id_produto,
             (dados->>'quantidade')::INTEGER AS quantidade,
             (dados->>'valor_unitario')::NUMERIC(6,2) AS valor_unitario,
             (id_raw)::BIGINT AS id_raw,
@@ -35,9 +35,10 @@ MERGE INTO silver.eventos s USING(
             id_loja,
             id_caixa,
             id_pedido,
-            produto_id,
+            id_produto,
             quantidade,
             valor_unitario,
+            pedido_uid,
             id_raw,
             data_ingestao_raw) 
 
@@ -50,8 +51,10 @@ MERGE INTO silver.eventos s USING(
             r.id_loja,
             r.id_caixa,
             r.id_pedido,
-            r.produto_id,
+            r.id_produto,
             r.quantidade,
             r.valor_unitario,
+            TO_CHAR(evento_time::DATE, 'YYYYMMDD') || LPAD(id_loja::TEXT, 3, '0') || 
+            LPAD(id_caixa::TEXT, 3, '0') || LPAD(id_pedido::TEXT, 6,'0'),
             r.id_raw,
             r.data_ingestao_raw);

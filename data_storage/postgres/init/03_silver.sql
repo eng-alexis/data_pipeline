@@ -10,9 +10,10 @@ CREATE TABLE IF NOT EXISTS silver.eventos(
     id_loja     INTEGER,
     id_caixa    INTEGER,
     id_pedido   INTEGER,
-    produto_id  INTEGER,
+    id_produto  INTEGER,
     quantidade  INTEGER,
     valor_unitario NUMERIC(6,2),
+    pedido_uid VARCHAR(20),
     id_raw BIGINT,
     data_ingestao_raw TIMESTAMP
 );
