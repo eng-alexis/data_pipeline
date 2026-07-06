@@ -25,11 +25,9 @@ def find_hash(connection_db, hash):
     try:
 
         cursor.execute(query, (hash,))
-
         resultado = cursor.fetchone()
 
         return resultado[0] if resultado else False
 
     except Exception as e:
         print(f"Erro ao conectar ou consultar o banco: {e}")
-        return False

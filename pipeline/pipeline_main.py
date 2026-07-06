@@ -8,12 +8,12 @@ from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_wate
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution
 
-from pipeline.config.paths import JSON_EVENTS_DIR
+from pipeline.config.paths import PDV_NEW_FILES_DIR
 from datetime import datetime
 
 conx = get_db_connection()
 
-path_padrão = JSON_EVENTS_DIR
+path_padrão = PDV_NEW_FILES_DIR
 
 tipos_esperados = ["jsonl", "json"]
 
@@ -34,28 +34,46 @@ for tipo in tipos_esperados:
             conx.commit()
 
             try:
- 
+
+                etapa = "RAW"
                 etapa_1 = etapa_raw(id_exec, arquivo)
 
-                id_arquivo, nome_arquivo, hash_arquivo, entidade = etapa_1
+                status, id_arquivo, nome_arquivo, hash_arquivo, entidade = etapa_1
 
-                etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
-                etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
-                etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
+                if status == 'SUCESSO':
 
-                fim_pipeline = datetime.now()
+                    etapa = "SILVER"
+                    etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
+                    etapa = "GOLD_CALENDARIO"
+                    etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
+                    etapa = "GOLD"
+                    etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
 
-                update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', arquivo=nome_arquivo, 
-                                 hash=hash_arquivo)
-                           
-                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                    fim_pipeline = datetime.now()
+
+                    update_execution(conx, id_exec, fim_pipeline, status, arquivo=nome_arquivo, 
+                                    hash=hash_arquivo)
+                            
+                    upd_watermark_exec(conx, id_exec, fim_pipeline)
+                
+                else:
+
+                    fim_pipeline = datetime.now()
+                    msg = "Arquivo duplicado"
+                    update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', arquivo=nome_arquivo, mensagem= msg, 
+                                    hash=hash_arquivo)
+                            
+                    upd_watermark_exec(conx, id_exec, fim_pipeline)
+                     
 
             except Exception as e:
 
                 fim_pipeline = datetime.now()
                 msg = f"{type(e).__name__}"
 
-                update_execution(conx, id_exec, fim_pipeline, 'ERRO', mensagem=msg )
-                print(f"Erro: {e}")
+                update_execution(conx, id_exec, fim_pipeline, 'ERRO', arquivo=nome_arquivo, mensagem=msg )
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                
+                print(f"Etapa: {etapa} - Erro: {e} - File: {nome_arquivo}")
              
 print("Pipeline Concluido")
