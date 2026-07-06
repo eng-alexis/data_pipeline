@@ -5,16 +5,16 @@ from pathlib import Path
 PIPELINE_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT  = Path(__file__).resolve().parents[2]
 
-JSON_EVENTS_DIR    = PROJECT_ROOT / "pdv_simulator" / "pdv_sales" 
-JSON_EVENTS_DIR.mkdir(parents=True, exist_ok=True)
+PDV_NEW_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pdv_new_files"
+PDV_NEW_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
-JSON_DATABASE_DIR  = PROJECT_ROOT / "pdv_simulator" / "pdv_sales" / "database"
+# JSON_DATABASE_DIR  = PROJECT_ROOT / "pdv_sales" / "database"
 
-JSON_PROCESSED_DIR = PIPELINE_ROOT / "processed_files" / "arq_processados"
-JSON_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+PIPE_PROCESSED_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_processed_files" / "processed"
+PIPE_PROCESSED_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
-JSON_DUPLICATE_DIR = PIPELINE_ROOT / "processed_files" / "arq_duplicados" 
-JSON_DUPLICATE_DIR.mkdir(parents=True, exist_ok=True)
+PIPE_DUPLICATE_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_processed_files" / "duplicate"
+PIPE_DUPLICATE_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 SQL_LOAD_TO_EVENTOS  = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_eventos.sql"
 SQL_LOAD_TO_PRODUTOS = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_produtos.sql"
