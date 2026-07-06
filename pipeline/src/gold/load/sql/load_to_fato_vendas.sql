@@ -3,13 +3,14 @@ MERGE INTO gold.fato_vendas g USING(
     SELECT 
         evento_time::DATE AS data, 
         evento_time::TIME AS hora,
-        DATE_TRUNC('hour', evento_time::TIME)::TIME AS inicio_hora,
+        LPAD(EXTRACT(HOUR FROM evento_time)::TEXT,2,'0') || ':00' AS inicio_hora,
         id_loja,
         id_caixa,
         id_pedido,
-        produto_id,
+        id_produto,
         quantidade,
         (quantidade * valor_unitario) AS valor_total,
+        pedido_uid,
         id_silver
     FROM 
         silver.eventos
@@ -29,6 +30,7 @@ MERGE INTO gold.fato_vendas g USING(
         id_loja,
         id_caixa,
         id_pedido,
+        pedido_uid,
         id_produto,
         quantidade,
         valor_total)
@@ -41,6 +43,7 @@ MERGE INTO gold.fato_vendas g USING(
         s.id_loja,
         s.id_caixa,
         s.id_pedido,
-        s.produto_id,
+        s.pedido_uid,
+        s.id_produto,
         s.quantidade,
         s.valor_total);
