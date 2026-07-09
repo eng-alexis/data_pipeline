@@ -21,6 +21,19 @@ def rename_file(arquivo, inicio):
 
     return Path(novo_nome)
 
+# Cria variavel com novo nome do arquivo
+
+def file_new_name(arquivo, inicio):
+
+    data = inicio.date()
+    hora = inicio.strftime("%H:%M:%S")
+
+    short_name = Path(arquivo).name
+
+    novo_nome = f"{data}_{hora}_{short_name}"
+
+    return novo_nome
+
 # Move arquivos processados
 
 def move_file(arquivo, destino):
