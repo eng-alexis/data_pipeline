@@ -4,16 +4,20 @@ from pipeline.src.raw.validate.schema_validate import schema_event_validation, s
 
 def validate_schema(registro, entidade):
 
-    if entidade == "eventos":
+    try:
 
-        versao_schema, status, validation_error = schema_event_validation(registro)
+        if entidade == "eventos":
+            versao_schema, status, validation_error = schema_event_validation(registro)
+            return versao_schema, status, validation_error
+        
+        elif entidade == "produtos":
+            versao_schema, status, validation_error = schema_product_validation(registro)
+            return versao_schema, status, validation_error
 
-    elif entidade == "produtos":
-
-        versao_schema, status, validation_error = schema_product_validation(registro)
-
-    elif entidade == "lojas":
-
-        versao_schema, status, validation_error = schema_store_validation(registro)
-
-    return versao_schema, status, validation_error
+        elif entidade == "lojas":
+            versao_schema, status, validation_error = schema_store_validation(registro)
+            return versao_schema, status, validation_error
+    
+    except Exception as e:
+        print(f"erro na validade_schema: {e}")
+        raise
