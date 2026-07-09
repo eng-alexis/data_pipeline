@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from pipeline.common.exceptions.pipeline_exceptions import EmptyfileExcept
+
 def encontrar_arquivos(caminho, formato):
 
     path = Path(caminho)
@@ -12,6 +14,16 @@ def encontrar_arquivos(caminho, formato):
 
         if arquivo:
             yield arquivo
+
+# Verifica se o arquivo esta vazio
+
+def is_file_empty(arquivo):
+        
+    with open(arquivo, 'r', encoding="utf-8") as arq_json:
+
+        conteudo = arq_json.read().strip()
+
+        return False if conteudo else True
 
 # Extrair registros de arquivos jsonl e json
 
@@ -25,7 +37,8 @@ def extrair_registros(arquivo, tipo_file):
                 linha = linha.strip()
 
                 if linha:
-                    yield json.loads(linha)
+                    yield json.loads(linha)  
+
 
         elif tipo_file == "json":
 
@@ -33,10 +46,8 @@ def extrair_registros(arquivo, tipo_file):
 
             for linha in registros:
 
-                yield linha
-
-        else:
-            print("Tipo de arquivo não é permitido")
+                if linha:
+                    yield linha
 
 # descobre a entidade com base no nome do arquivo
 
