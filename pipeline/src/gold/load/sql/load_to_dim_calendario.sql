@@ -15,7 +15,7 @@ MERGE INTO gold.dim_calendario g USING(
             --TO_CHAR(evento_time::DATE,'mon') AS mes_abreviado,
             TO_CHAR(evento_time::DATE, 'Month') AS mes_nome,
             EXTRACT(WEEK FROM evento_time::DATE) AS semana,
-            EXTRACT(DOW FROM evento_time::DATE) AS dia,
+            EXTRACT(DOW FROM evento_time::DATE) AS dia_semana,
 
             CASE EXTRACT(DOW FROM evento_time::DATE)
             WHEN 0 THEN 'Dom' WHEN 1 THEN 'Seg' WHEN 2 THEN 'Ter'
@@ -38,7 +38,7 @@ MERGE INTO gold.dim_calendario g USING(
         mes_abreviado,
         mes_nome,
         semana,
-        dia,
+        dia_semana,
         dia_nome)
 
     VALUES(
@@ -50,6 +50,6 @@ MERGE INTO gold.dim_calendario g USING(
         s.mes_abreviado,
         s.mes_nome,
         s.semana,
-        s.dia,
+        s.dia_semana,
         s.dia_nome
     );
