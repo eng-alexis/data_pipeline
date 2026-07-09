@@ -10,11 +10,17 @@ PDV_NEW_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 # JSON_DATABASE_DIR  = PROJECT_ROOT / "pdv_sales" / "database"
 
-PIPE_PROCESSED_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_processed_files" / "processed"
+PIPE_PROCESSED_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_processed_files"
 PIPE_PROCESSED_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
-PIPE_DUPLICATE_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_processed_files" / "duplicate"
+PIPE_DUPLICATE_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_reject_files" / "duplicated_file"
 PIPE_DUPLICATE_FILES_DIR.mkdir(parents=True, exist_ok=True)
+
+PIPE_INVALID_ENTITY_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_reject_files" / "invalid_entity"
+PIPE_INVALID_ENTITY_DIR.mkdir(parents=True, exist_ok=True)
+
+PIPE_EMPTY_FILES_DIR = PROJECT_ROOT / "pdv_sales" / "pipe_reject_files" / "empty_files"
+PIPE_EMPTY_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 SQL_LOAD_TO_EVENTOS  = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_eventos.sql"
 SQL_LOAD_TO_PRODUTOS = PIPELINE_ROOT / "src" / "silver" / "load" / "sql" / "load_to_produtos.sql"
