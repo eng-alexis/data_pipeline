@@ -5,17 +5,27 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
     inicio TIMESTAMP,
     fim TIMESTAMP,
     arquivo VARCHAR(50),
-    hash VARCHAR(64),
-    status VARCHAR(15),
-    mensagem VARCHAR(50),
+    status VARCHAR(30),
+    motivo VARCHAR(40),
+    mensagem VARCHAR(255),
 
     CONSTRAINT ck_status
     CHECK ( status IN (
         'PROCESSANDO',
         'SUCESSO',
-        'DUPLICADO',
-        'ERRO'))
-);
+        'INTERROMPIDO',
+        'ERRO')),
+
+    CONSTRAINT ck_motivo
+    CHECK ( motivo IN (
+        'ARQUIVO_DUPLICADO',
+        'ARQUIVO_INVALIDO',
+        'ARQUIVO_VAZIO',
+        'ENTIDADE_INVALIDA',
+        'REGISTROS_INVALIDOS',
+        'FALHA_NO_LOAD_RAW',
+        'UNEXPECTED_EXCEPTION'))
+        );
 
 CREATE TABLE IF NOT EXISTS audit.file_history(
     id_arquivo BIGSERIAL PRIMARY KEY,
@@ -51,6 +61,13 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_step(
     fim TIMESTAMP,
     duracao_ms BIGINT,
     status VARCHAR(15),
+
+    CONSTRAINT ck_status
+        CHECK ( status IN (
+        'PROCESSANDO',
+        'SUCESSO',
+        'INTERROMPIDO',
+        'ERRO')),
 
     CONSTRAINT fk_id_exec
     FOREIGN KEY (id_exec)
