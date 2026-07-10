@@ -7,9 +7,12 @@ from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution
+from pipeline.common.monitoring.pipeline_step import upd_step
 
 from pipeline.config.paths import PDV_NEW_FILES_DIR
 from datetime import datetime
+
+from pipeline.common.exceptions.pipeline_exceptions import UnknownEntityException, DuplicateFileException, EmptyfileExcept, AllRecordsQuarantinedException, InsertRecordsFail
 
 conx = get_db_connection()
 
@@ -38,42 +41,70 @@ for tipo in tipos_esperados:
                 etapa = "RAW"
                 etapa_1 = etapa_raw(id_exec, arquivo)
 
-                status, id_arquivo, nome_arquivo, hash_arquivo, entidade = etapa_1
+                id_arquivo, nome_arquivo, entidade = etapa_1
 
-                if status == 'SUCESSO':
+                etapa = "SILVER"
+                etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
+                etapa = "GOLD_CALENDARIO"
+                etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
+                etapa = "GOLD"
+                etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
 
-                    etapa = "SILVER"
-                    etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
-                    etapa = "GOLD_CALENDARIO"
-                    etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
-                    etapa = "GOLD"
-                    etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
 
-                    fim_pipeline = datetime.now()
+                fim_pipeline = datetime.now()
 
-                    update_execution(conx, id_exec, fim_pipeline, status, arquivo=nome_arquivo, 
-                                    hash=hash_arquivo)
-                            
-                    upd_watermark_exec(conx, id_exec, fim_pipeline)
-                
-                else:
+                update_execution(conx, id_exec, fim_pipeline, arquivo=nome_arquivo, status='SUCESSO',motivo=None, mensagem=None)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                        
 
-                    fim_pipeline = datetime.now()
-                    msg = "Arquivo duplicado"
-                    update_execution(conx, id_exec, fim_pipeline, 'SUCESSO', arquivo=nome_arquivo, mensagem= msg, 
-                                    hash=hash_arquivo)
-                            
-                    upd_watermark_exec(conx, id_exec, fim_pipeline)
+            except UnknownEntityException as e:
+                fim_pipeline = datetime.now()
+
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                 
+
+            except DuplicateFileException as e:
+                fim_pipeline = datetime.now()
+
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+
+
+            except EmptyfileExcept as e:      
+                fim_pipeline = datetime.now()
+
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+
+
+            except AllRecordsQuarantinedException as e:   
+                fim_pipeline = datetime.now()
+
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
                      
 
-            except Exception as e:
+            except InsertRecordsFail as e:
+                fim_pipeline = datetime.now()
 
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+
+            except Exception as e:
+                 
                 fim_pipeline = datetime.now()
                 msg = f"{type(e).__name__}"
 
-                update_execution(conx, id_exec, fim_pipeline, 'ERRO', arquivo=nome_arquivo, mensagem=msg )
+                update_execution(conx, id_exec, fim_pipeline, arquivo= "atual_teste", status="ERRO", motivo="UNEXPECTED_EXCEPTION",mensagem=msg)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
+                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
                 
-                print(f"Etapa: {etapa} - Erro: {e} - File: {nome_arquivo}")
+                print(f"Etapa: {etapa} - Erro: {e}")
              
 print("Pipeline Concluido")

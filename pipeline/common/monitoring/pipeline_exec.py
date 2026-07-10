@@ -13,19 +13,18 @@ def reg_new_execution(connection_db, id_exec, inicio):
 
     return True
 
-
 # Atualizar execução do pipeline
 
-def update_execution(connection_db, id_exec, fim, status, arquivo=None, hash=None, mensagem=None):
+def update_execution(connection_db, id_exec, fim, arquivo, status, motivo=None, mensagem=None):
     
     conx = connection_db
     cursor = conx.cursor()
 
     query = """UPDATE audit.pipeline_execution
-                SET fim = %s, arquivo = %s, hash = %s, status = %s, mensagem = %s
+                SET fim = %s, arquivo = %s, status = %s, motivo = %s, mensagem = %s
                 WHERE id_exec = %s;"""
 
-    valores = (fim, arquivo, hash, status, mensagem, id_exec)
+    valores = (fim, arquivo, status, motivo, mensagem, id_exec)
 
     cursor.execute(query, valores)
     conx.commit()

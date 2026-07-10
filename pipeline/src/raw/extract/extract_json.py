@@ -3,8 +3,6 @@
 import json
 from pathlib import Path
 
-from pipeline.common.exceptions.pipeline_exceptions import EmptyfileExcept
-
 def encontrar_arquivos(caminho, formato):
 
     path = Path(caminho)
@@ -65,6 +63,3 @@ def descobrir_entidade(arquivo):
     
     elif "20" in arquivo.name:
         return entidade_3
-    
-    else:
-        return print("entidade não identificada")
