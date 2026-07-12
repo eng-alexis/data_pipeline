@@ -31,7 +31,7 @@ def etapa_gold(id_execucao, id_arquivo, entidade):
  
     fim_step = datetime.now()
     diferenca = (fim_step - inicio_step)
-    duracao = diferenca.total_seconds()
+    duracao = int((diferenca.total_seconds()*1000))
 
     ultimo_id_after = get_ultimo_id_tabela(conexao, 'id_fato', 'gold.fato_vendas')
     linhas_gravadas = (ultimo_id_after - ultimo_id_before)
@@ -60,7 +60,7 @@ def etapa_gold_calendario(id_execucao, id_arquivo):
 
     fim_step = datetime.now()
     diferenca = (fim_step - inicio_step)
-    duracao = diferenca.total_seconds()
+    duracao = int((diferenca.total_seconds()*1000))
 
     ultimo_id_after = get_ultimo_id_tabela(conexao, 'id_calendario', 'gold.dim_calendario')
     linhas_gravadas = (ultimo_id_after - ultimo_id_before)

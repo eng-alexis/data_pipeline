@@ -1,8 +1,8 @@
 from pipeline.src.raw.raw_main import etapa_raw
+from pipeline.src.raw.extract.extract_json import encontrar_arquivos
 from pipeline.src.silver.silver_main import etapa_silver
 from pipeline.src.gold.gold_main import etapa_gold, etapa_gold_calendario
 
-from pipeline.src.raw.extract.extract_json import encontrar_arquivos
 from pipeline.common.database.conx_database import get_db_connection
 from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec
 from pipeline.common.monitoring.pipeline_exec import update_execution
@@ -45,65 +45,83 @@ for tipo in tipos_esperados:
 
                 etapa = "SILVER"
                 etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
-                etapa = "GOLD_CALENDARIO"
-                etapa_3 = etapa_gold_calendario(id_exec, id_arquivo)
                 etapa = "GOLD"
-                etapa_4 = etapa_gold(id_exec, id_arquivo, entidade)
-
+                etapa_3 = etapa_gold(id_exec, id_arquivo, entidade)
+                etapa = "GOLD_CALENDARIO"
+                etapa_4 = etapa_gold_calendario(id_exec, id_arquivo)
 
                 fim_pipeline = datetime.now()
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo=nome_arquivo, status='SUCESSO',motivo=None, mensagem=None)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                        
+
 
             except UnknownEntityException as e:
+                inicio_step = e.inicio
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
                  
 
             except DuplicateFileException as e:
+                inicio_step = e.inicio
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
 
 
             except EmptyfileExcept as e:      
+                inicio_step = e.inicio
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
 
 
             except AllRecordsQuarantinedException as e:   
+                inicio_step = e.inicio
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
 
-                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
+                update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo="REGISTROS_INVALIDOS", mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
+
                      
-
             except InsertRecordsFail as e:
+                inicio_step = e.inicio
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
 
             except Exception as e:
                  
+                inicio_step = inicio_pipeline
                 fim_pipeline = datetime.now()
+                diferenca = (fim_pipeline - inicio_step)
+                duracao = int((diferenca.total_seconds()*1000))
+
                 msg = f"{type(e).__name__}"
 
-                update_execution(conx, id_exec, fim_pipeline, arquivo= "atual_teste", status="ERRO", motivo="UNEXPECTED_EXCEPTION",mensagem=msg)
+                update_execution(conx, id_exec, fim_pipeline, status="ERRO", motivo="UNEXPECTED_EXCEPTION",mensagem=msg)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
-                upd_step(conx, id_exec, 'RAW', fim_pipeline, 'INTERROMPIDO')
+                upd_step(conx, id_exec, fim_pipeline, "ERRO", 'RAW', duracao=duracao)
                 
                 print(f"Etapa: {etapa} - Erro: {e}")
              

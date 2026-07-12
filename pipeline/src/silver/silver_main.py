@@ -23,7 +23,7 @@ def etapa_silver(id_execution, id_arquivo, entidade):
                                                    sql_load_script)
     fim_step = datetime.now()
     diferenca = (fim_step - inicio_step)
-    duracao = diferenca.total_seconds()
+    duracao = int((diferenca.total_seconds()*1000))
 
     upd_step(conexao_db, id_exec=id_execution, fim=fim_step,status='SUCESSO', camada='SILVER',entidade=entidade_silver,
              id_arquivo=id_arquivo, linhas_lidas=linhas_lidas, linhas_gravadas=linhas_gravadas,duracao=duracao)
