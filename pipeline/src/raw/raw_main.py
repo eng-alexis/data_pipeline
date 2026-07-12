@@ -44,19 +44,16 @@ def etapa_raw(id_execution, arquivo_original):
 
             reject_file = rename_file(path_arquivo, datetime.now())
             move_file(reject_file, path_invalid_entity)
-
-            raise UnknownEntityException(arquivo=nome_arquivo, status='INTERROMPIDO',motivo='ENTIDADE_INVALIDA',
-                                          mensagem=f"a entidade não é suportada")
+        
+            raise UnknownEntityException(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
+                                            status="INTERROMPIDO", motivo='ENTIDADE_INVALIDA',
+                                            mensagem="a entidade não é suportada")
 
         reg_new_step(conexao_bd, id_exec, 'RAW', inicio_step, entidade)
 
         # Descobre tipo de arquivo (json ou jsonl)
-        
-        if entidade == "eventos":
-            tipo_file = "jsonl"
 
-        else:
-            tipo_file = "json"
+        tipo_file = "jsonl" if entidade == "eventos" else "json"
 
         # extrai informações 
                 
@@ -73,16 +70,13 @@ def etapa_raw(id_execution, arquivo_original):
 
             fim_step = datetime.now()
             
-            if entidade != "eventos":
-                path_arquivo = rename_file(path_arquivo, inicio_step)
-
-            else:
-                path_arquivo
+            path_arquivo = rename_file(path_arquivo,entidade, inicio_step)
 
             move_file(path_arquivo, path_duplicado)
 
-            raise DuplicateFileException(arquivo=nome_arquivo, status='INTERROMPIDO', motivo='ARQUIVO_DUPLICADO', 
-                                         mensagem=f"o arquivo '{nome_arquivo}' já foi processado anteriormente.")
+            raise DuplicateFileException(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
+                                            status="INTERROMPIDO", motivo="ARQUIVO_DUPLICADO",
+                                            mensagem=f"o arquivo {nome_arquivo} já foi processado anteriormente")
 
         else:
 
@@ -93,16 +87,19 @@ def etapa_raw(id_execution, arquivo_original):
             
         if is_file_empty(path_arquivo):
 
-            path_arquivo = rename_file(path_arquivo, inicio_step)
+            path_arquivo = rename_file(path_arquivo, entidade, inicio_step)
             move_file(path_arquivo, path_empty_files)
 
-            raise EmptyfileExcept(arquivo=nome_arquivo, status="INTERROMPIDO" , motivo="ARQUIVO_VAZIO",
-                                    mensagem=f"o arquivo '{nome_arquivo}' esta vazio.")
+            raise EmptyfileExcept(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
+                                            status="INTERROMPIDO", motivo="ARQUIVO_VAZIO",
+                                    mensagem=f"o arquivo {nome_arquivo} esta vazio.")
         
         # Extrai registros do arquivo
 
-
         registros = extrair_registros(path_arquivo, tipo_file)
+
+        load_tentativa_1 = 0 
+        load_tentativa_2 = 0
 
         try:
 
@@ -137,8 +134,6 @@ def etapa_raw(id_execution, arquivo_original):
 
                     # Carrega lote na tabela raw.
 
-                load_tentativa_1 = 0 
-
                 if len(lote) == tam_lote:
 
                     load_tentativa_1 += 1
@@ -147,56 +142,59 @@ def etapa_raw(id_execution, arquivo_original):
                     linhas_gravadas += len(lote)                            
                     lote.clear()
 
-            load_tentativa_2 = 0 
-
             if lote:
                 load_tentativa_2 += 1
 
                 load_to_raw(conexao_bd, nome_arquivo, lote, entidade, version_schema,'VALIDO', None)
                 linhas_gravadas += len(lote) 
                 lote.clear()
-                
-                if (load_tentativa_1 + load_tentativa_2) == 0:
-                    raise AllRecordsQuarantinedException(arquivo=nome_arquivo, status="INTERROMPIDO", motivo="REGISTROS_INVALIDOS",
-                                                            mensagem="todos os registros estão em quarentena")
-                
-            if not lote:
-                
-                # Registra arquivo na tabela de auditoria (audit.file_history)
 
-                data_ingestao = datetime.now()
-            
-                id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo,
-                                        data_ingestao, tamanho_bytes, id_exec)    
-
-                fim_step = datetime.now()
-                diferenca = (fim_step - inicio_step)
-                duracao   = diferenca.total_seconds()
-
-                # Atualiza tabela audit.pipeline_step
-
-                upd_step(conexao_bd, id_exec, 'RAW', fim_step, 'SUCESSO', duracao, id_arquivo, entidade, linhas_lidas, linhas_gravadas)
-
-                conexao_bd.commit()
+            conexao_bd.commit()
 
         except Exception as e:
 
             conexao_bd.rollback()
 
-            raise InsertRecordsFail(arquivo=nome_arquivo, status="INTERROMPIDO", motivo="FALHA_NO_LOAD_RAW",
-                                    mensagem=f"erro: {e}")
+            raise InsertRecordsFail(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
+                                                 status="INTERROMPIDO", motivo="FALHA_NO_LOAD_RAW",
+                                                 mensagem=f"erro: {e}")
 
-                                # Move arquivos processados e finaliza a etapa de ingestão.
+        if (load_tentativa_1 + load_tentativa_2) == 0:
 
-        if entidade != "eventos":
+            path_arquivo = rename_file(path_arquivo, entidade, inicio_step)
 
-            path_arquivo = rename_file(path_arquivo, inicio_step)
-        else:
-            path_arquivo
+            move = move_file(path_arquivo, path_processado)
 
-        move = move_file(path_arquivo, path_processado)
+            raise AllRecordsQuarantinedException(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
+                                                 status="INTERROMPIDO", motivo="REGISTROS_INVALIDOS",
+                                                 mensagem="todos os registros estão em quarentena")
+        
+        if not lote:
+            
+            # Registra arquivo na tabela de auditoria (audit.file_history)
 
-        if move:
-            delete_empty_dir(path_arquivo)
+            data_ingestao = datetime.now()
+        
+            id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo,data_ingestao, tamanho_bytes, id_exec)    
 
-        return  id_arquivo, nome_arquivo, entidade
+            fim_step = datetime.now()
+            diferenca = (fim_step - inicio_step)
+            duracao   = int((diferenca.total_seconds()*1000))
+
+            # Atualiza tabela audit.pipeline_step
+
+            upd_step(conexao_bd, id_exec, fim_step, status='SUCESSO',camada='RAW', entidade=entidade, id_arquivo=id_arquivo,
+                     linhas_lidas=linhas_lidas,linhas_gravadas=linhas_gravadas,duracao=duracao)
+
+            conexao_bd.commit()
+    
+                            # Move arquivos processados e finaliza a etapa de ingestão.
+
+            path_arquivo = rename_file(path_arquivo, entidade, inicio_step)
+
+            move = move_file(path_arquivo, path_processado)
+
+            if move:
+                delete_empty_dir(path_arquivo)
+
+            return  id_arquivo, nome_arquivo, entidade
