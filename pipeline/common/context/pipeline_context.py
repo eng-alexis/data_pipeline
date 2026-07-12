@@ -1,5 +1,3 @@
-from psycopg2 import sql
-
 # Retorna ID da execução
 
 def gerar_id_contexto(conection_db):
@@ -37,7 +35,6 @@ def upd_watermark_exec(conection_db, id_exec_atual, data_execução):
     valores = (id_exec_atual, data_execução)
 
     cursor.execute(query, valores)
-
     conx.commit()
 
 # Retorna o ultimo id processado pela etapa
@@ -62,15 +59,10 @@ def upd_watermark_layer(conection_bd, column_name, table_name, watermark_name, d
     conx = conection_bd
     cursor = conx.cursor()
 
-    # Busca o ultimo id da entidade (ex: id 100)
-
     query_1 = f"""SELECT MAX({column_name}) FROM {table_name};"""
-    # valores = (id, entidade)
 
     cursor.execute(query_1)
     ultimo_id = cursor.fetchone()[0]
-
-    # Atualiza o watermark com o valor do ultimo id da entidade
 
     query_2 = ("""UPDATE audit.pipeline_watermark
                         SET ultimo_id = %s, data_execucao = %s 
@@ -79,5 +71,16 @@ def upd_watermark_layer(conection_bd, column_name, table_name, watermark_name, d
     valores = (ultimo_id, data_execução, watermark_name)
     
     cursor.execute(query_2, valores)
-
     conx.commit()
+
+# Retorna o ultimo id processado pela etapa dim calendario
+
+def get_ultimo_id_tabela(conection_db, coluna_id, tabela):
+    
+    conx = conection_db
+    cursor = conx.cursor()
+
+    query = f"""SELECT COALESCE(MAX({coluna_id}), 0) FROM {tabela};"""
+    cursor.execute(query)
+
+    return cursor.fetchone()[0]
