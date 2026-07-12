@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS gold.dim_lojas(
 );
 
 CREATE TABLE IF NOT EXISTS gold.dim_calendario(
+    id_calendario BIGSERIAL,
     data DATE,
     ano INT,
     semestre INT,

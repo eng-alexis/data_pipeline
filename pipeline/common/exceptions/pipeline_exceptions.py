@@ -1,8 +1,10 @@
 # Base das exceptions
 
 class PipelineBusinessException(Exception):
-    def __init__(self, arquivo, status, motivo, mensagem):
+    def __init__(self, arquivo, entidade, inicio, status, motivo, mensagem):
         self.arquivo = arquivo
+        self.entidade = entidade
+        self.inicio = inicio
         self.status = status
         self.motivo = motivo
         self.mensagem = mensagem
