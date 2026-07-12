@@ -4,22 +4,27 @@ from pathlib import Path
 
 # Renomeia arquivo
 
-def rename_file(arquivo, inicio):
+def rename_file(arquivo, entidade, inicio):
 
-    data = inicio.date()
-    hora = inicio.strftime("%H:%M:%S")
+    if entidade != "eventos":
 
-    arquivo = Path(arquivo)
-    file_parent = arquivo.resolve().parent
+        data = inicio.date()
+        hora = inicio.strftime("%H:%M:%S")
 
-    file_name = arquivo.name
+        arquivo = Path(arquivo)
+        file_parent = arquivo.resolve().parent
 
-    original_name = arquivo
-    novo_nome = os.path.join(file_parent, f"{data}_{hora}_{file_name}")
+        file_name = arquivo.name
 
-    os.rename(original_name, novo_nome)
+        original_name = arquivo
+        novo_nome = os.path.join(file_parent, f"{data}_{hora}_{file_name}")
 
-    return Path(novo_nome)
+        os.rename(original_name, novo_nome)
+
+        return Path(novo_nome)
+    
+    else:
+        return arquivo
 
 # Cria variavel com novo nome do arquivo
 
