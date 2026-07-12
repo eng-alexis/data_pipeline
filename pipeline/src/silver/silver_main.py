@@ -25,7 +25,8 @@ def etapa_silver(id_execution, id_arquivo, entidade):
     diferenca = (fim_step - inicio_step)
     duracao = diferenca.total_seconds()
 
-    upd_step(conexao_db, id_execution, 'SILVER', fim_step, 'SUCESSO', duracao, id_arquivo, entidade_silver, linhas_lidas, linhas_gravadas)
+    upd_step(conexao_db, id_exec=id_execution, fim=fim_step,status='SUCESSO', camada='SILVER',entidade=entidade_silver,
+             id_arquivo=id_arquivo, linhas_lidas=linhas_lidas, linhas_gravadas=linhas_gravadas,duracao=duracao)
 
     upd_watermark_layer(conexao_db, "id_raw", "raw.eventos", watermark_name, fim_step)
 

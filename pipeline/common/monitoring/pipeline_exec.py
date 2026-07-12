@@ -15,7 +15,7 @@ def reg_new_execution(connection_db, id_exec, inicio):
 
 # Atualizar execução do pipeline
 
-def update_execution(connection_db, id_exec, fim, arquivo, status, motivo=None, mensagem=None):
+def update_execution(connection_db, id_exec, fim, status, arquivo=None, motivo=None, mensagem=None):
     
     conx = connection_db
     cursor = conx.cursor()
