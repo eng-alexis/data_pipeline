@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
 from datetime import datetime
 from uuid import UUID
 
@@ -20,12 +19,14 @@ class EventoSchema_V1(BaseModel):
 
 class ProductSchema_V1(BaseModel):
 
+    model_config = ConfigDict(extra="forbid")
     id: int
     nome: str
     valor: float
 
 class StoreSchema_V1(BaseModel):
     
+    model_config = ConfigDict(extra="forbid")
     ID: int
     CNPJ: str
     Endereço: str
