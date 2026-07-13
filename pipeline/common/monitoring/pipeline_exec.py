@@ -1,14 +1,14 @@
 # Registra nova execução e define o id da execução
 
-def reg_new_execution(connection_db, id_exec, inicio):
+def reg_new_execution(connection_db, id_ciclo, id_exec, inicio):
 
     conx = connection_db
     cursor = conx.cursor()
 
-    query = """INSERT INTO audit.pipeline_execution (id_exec, inicio, status)
-    VALUES(%s, %s, 'PROCESSANDO');"""
+    query = """INSERT INTO audit.pipeline_execution (id_ciclo, id_exec, inicio, status)
+    VALUES(%s, %s, %s, 'PROCESSANDO');"""
 
-    valores = (id_exec, inicio)
+    valores = (id_ciclo, id_exec, inicio)
     cursor.execute(query, valores)
 
     return True

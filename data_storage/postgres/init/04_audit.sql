@@ -1,7 +1,25 @@
 -- Tabelas de auditoria
 
+CREATE TABLE IF NOT EXISTS audit.pipeline_cycle(
+    id_cycle BIGSERIAL,
+    inicio_cycle TIMESTAMP,
+    fim_cycle TIMESTAMP,
+    duracao_ms BIGINT,
+    qtde_arquivos_lidos INT,
+    qtde_arquivos_processados INT,
+    tamanho_bytes BIGINT,
+    qtde_registros BIGINT,
+    qtde_registros_invalidos BIGINT,
+    status VARCHAR(20),
+    
+    CONSTRAINT ck_status
+    CHECK (status IN ('PROCESSANDO','SUCESSO'))
+    );
+
+
 CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
     id_exec BIGINT PRIMARY KEY,
+    id_ciclo BIGINT,
     inicio TIMESTAMP,
     fim TIMESTAMP,
     arquivo VARCHAR(50),
@@ -27,6 +45,7 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_execution(
         'UNEXPECTED_EXCEPTION'))
         );
 
+
 CREATE TABLE IF NOT EXISTS audit.file_history(
     id_arquivo BIGSERIAL PRIMARY KEY,
     hash VARCHAR(64),
@@ -48,6 +67,7 @@ CREATE TABLE IF NOT EXISTS audit.file_history(
         'PROCESSADO',
         'ERRO'))
 );
+
 
 CREATE TABLE IF NOT EXISTS audit.pipeline_step(
     id_step BIGSERIAL PRIMARY KEY,
@@ -78,6 +98,7 @@ CREATE TABLE IF NOT EXISTS audit.pipeline_step(
     REFERENCES audit.file_history(id_arquivo)
 );
 
+
 CREATE TABLE audit.pipeline_watermark(
     id_watermark SERIAL,
     watermark_name VARCHAR(40),
@@ -89,19 +110,3 @@ INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('context_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.eventos_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('silver.eventos_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('gold.fato_vendas_last_id');
-
-
-CREATE TABLE IF NOT EXISTS audit.pipeline_cycle(
-    id_cycle BIGSERIAL,
-    inicio_cycle TIMESTAMP,
-    fim_cycle TIMESTAMP,
-    duracao_ms BIGINT,
-    qtde_arquivos_lidos INT,
-    qtde_arquivos_processados INT,
-    tamanho_bytes BIGINT,
-    qtde_registros BIGINT,
-    qtde_registros_invalidos BIGINT,
-    status VARCHAR(20),
-    
-    CONSTRAINT ck_status
-    CHECK (status IN ('PROCESSANDO','SUCESSO')));

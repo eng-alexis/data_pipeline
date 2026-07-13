@@ -28,9 +28,9 @@ print("Pipeline Iniciado")
 conx = get_db_connection()
 
 inicio_ciclo = datetime.now()
-id = reg_pipeline_cycle(conx, inicio_ciclo)
+id_ciclo = reg_pipeline_cycle(conx, inicio_ciclo)
 
-total_tamanho_files  = 0
+total_tamanho_files   = 0
 total_arquivos_lidos  = 0
 total_arquivos_processados = 0
 total_qtde_registros = 0 
@@ -55,7 +55,7 @@ for tipo in tipos_esperados:
             inicio_pipeline = datetime.now()
             id_exec = gerar_id_contexto(conx)
     
-            reg_new_execution(conx, id_exec, inicio_pipeline)
+            reg_new_execution(conx, id_ciclo, id_exec, inicio_pipeline)
             conx.commit()
 
             try:
@@ -157,7 +157,7 @@ fim_ciclo = datetime.now()
 diferenca = (fim_ciclo - inicio_ciclo)
 duracao   = int((diferenca.total_seconds()*1000))
 
-upd_pipeline_cycle(conx, id, fim_ciclo, duracao, total_arquivos_lidos, total_arquivos_processados, total_tamanho_files,
+upd_pipeline_cycle(conx, id_ciclo, fim_ciclo, duracao, total_arquivos_lidos, total_arquivos_processados, total_tamanho_files,
                     total_qtde_registros, total_qtde_registros_invalidos)
 
 conx.commit()
