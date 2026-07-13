@@ -89,3 +89,19 @@ INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('context_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('raw.eventos_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('silver.eventos_last_id');
 INSERT INTO audit.pipeline_watermark(watermark_name) VALUES('gold.fato_vendas_last_id');
+
+
+CREATE TABLE IF NOT EXISTS audit.pipeline_cycle(
+    id_cycle BIGSERIAL,
+    inicio_cycle TIMESTAMP,
+    fim_cycle TIMESTAMP,
+    duracao_ms BIGINT,
+    qtde_arquivos_lidos INT,
+    qtde_arquivos_processados INT,
+    tamanho_bytes BIGINT,
+    qtde_registros BIGINT,
+    qtde_registros_invalidos BIGINT,
+    status VARCHAR(20),
+    
+    CONSTRAINT ck_status
+    CHECK (status IN ('PROCESSANDO','SUCESSO')));
