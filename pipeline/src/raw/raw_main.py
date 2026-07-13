@@ -103,6 +103,8 @@ def etapa_raw(id_execution, arquivo_original):
 
         try:
 
+            registros_invalidos = 0
+
             for linha in registros:
                 
                 linhas_lidas += 1
@@ -127,6 +129,8 @@ def etapa_raw(id_execution, arquivo_original):
                     nome_entidade = f"raw.{entidade}"
                     load_to_raw(conexao_bd, nome_arquivo, [linha], nome_entidade, version_schema,
                                 'INVALIDO', 'Em quarentena')
+                    
+                    registros_invalidos += 1
                     
                 elif status == "VALIDO":      
 
@@ -197,4 +201,4 @@ def etapa_raw(id_execution, arquivo_original):
             if move:
                 delete_empty_dir(path_arquivo)
 
-            return  id_arquivo, nome_arquivo, entidade
+            return  id_arquivo, nome_arquivo, entidade, registros_invalidos
