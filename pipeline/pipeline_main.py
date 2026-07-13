@@ -1,5 +1,5 @@
 from pipeline.src.raw.raw_main import etapa_raw
-from pipeline.src.raw.extract.extract_json import encontrar_arquivos
+from pipeline.src.raw.extract.extract_json import encontrar_arquivos, contar_registros
 from pipeline.src.silver.silver_main import etapa_silver
 from pipeline.src.gold.gold_main import etapa_gold, etapa_gold_calendario
 
@@ -8,6 +8,9 @@ from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_wate
 from pipeline.common.monitoring.pipeline_exec import update_execution
 from pipeline.common.monitoring.pipeline_exec import reg_new_execution
 from pipeline.common.monitoring.pipeline_step import upd_step
+
+from pipeline.common.monitoring.pipeline_cycle import reg_pipeline_cycle, upd_pipeline_cycle
+from pipeline.common.database.conx_database import get_db_connection
 
 from pipeline.config.paths import PDV_NEW_FILES_DIR
 from datetime import datetime
@@ -22,11 +25,30 @@ tipos_esperados = ["jsonl", "json"]
 
 print("Pipeline Iniciado")
 
+conx = get_db_connection()
+
+inicio_ciclo = datetime.now()
+id = reg_pipeline_cycle(conx, inicio_ciclo)
+
+total_tamanho_files  = 0
+total_arquivos_lidos  = 0
+total_arquivos_processados = 0
+total_qtde_registros = 0 
+total_qtde_registros_invalidos = 0 
+
 for tipo in tipos_esperados:
 
         arquivos_encontrados = encontrar_arquivos(path_padrão, tipo)
 
         for arquivo in arquivos_encontrados:
+
+            total_arquivos_lidos += 1
+
+            qtde_registros = contar_registros(arquivo, tipo)
+            total_qtde_registros += qtde_registros
+
+            tamanho_file = arquivo.stat().st_size
+            total_tamanho_files += tamanho_file
 
             # Registra nova execução do pipeline na tabela de auditoria
 
@@ -41,7 +63,9 @@ for tipo in tipos_esperados:
                 etapa = "RAW"
                 etapa_1 = etapa_raw(id_exec, arquivo)
 
-                id_arquivo, nome_arquivo, entidade = etapa_1
+                id_arquivo, nome_arquivo, entidade, reg_invalidos = etapa_1
+
+                total_qtde_registros_invalidos += reg_invalidos
 
                 etapa = "SILVER"
                 etapa_2 = etapa_silver(id_exec, id_arquivo, entidade)
@@ -54,6 +78,8 @@ for tipo in tipos_esperados:
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo=nome_arquivo, status='SUCESSO',motivo=None, mensagem=None)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
+
+                total_arquivos_processados += 1
 
 
             except UnknownEntityException as e:
@@ -110,8 +136,8 @@ for tipo in tipos_esperados:
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
                 upd_step(conx, id_exec, fim_pipeline, e.status, 'RAW', e.entidade, duracao=duracao)
 
+
             except Exception as e:
-                 
                 inicio_step = inicio_pipeline
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
@@ -126,3 +152,12 @@ for tipo in tipos_esperados:
                 print(f"Etapa: {etapa} - Erro: {e}")
              
 print("Pipeline Concluido")
+
+fim_ciclo = datetime.now()
+diferenca = (fim_ciclo - inicio_ciclo)
+duracao   = int((diferenca.total_seconds()*1000))
+
+upd_pipeline_cycle(conx, id, fim_ciclo, duracao, total_arquivos_lidos, total_arquivos_processados, total_tamanho_files,
+                    total_qtde_registros, total_qtde_registros_invalidos)
+
+conx.commit()
