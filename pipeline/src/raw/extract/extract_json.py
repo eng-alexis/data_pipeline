@@ -63,3 +63,32 @@ def descobrir_entidade(arquivo):
     
     elif "20" in arquivo.name:
         return entidade_3
+    
+
+# Contar registros de arquivos jsonl e json
+
+def contar_registros(arquivo, tipo_file):
+
+    with open(arquivo, 'r', encoding="utf-8") as arq_json:
+
+        qtd_registros = 0
+
+        if tipo_file == "jsonl":
+
+            for linha in arq_json:
+                linha = linha.strip()
+
+                if linha:
+                    qtd_registros += 1 
+
+
+        elif tipo_file == "json":
+
+            registros = json.load(arq_json)
+
+            for linha in registros:
+
+                if linha:
+                     qtd_registros += 1
+
+    return qtd_registros
