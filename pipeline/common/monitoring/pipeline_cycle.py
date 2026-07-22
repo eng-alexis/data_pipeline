@@ -20,8 +20,8 @@ def reg_pipeline_cycle(conexao_bd, inicio):
 
 # Atualiza informações no final do ciclo
 
-
-def upd_pipeline_cycle(conexao_bd, id_cycle, fim_cycle, duracao, qtde_arquivos, qtde_arquivos_processados, tamanho_bytes, qtde_registros, qtde_registros_invalidos):
+def upd_pipeline_cycle(conexao_bd, id_cycle, fim_cycle, duracao, qtde_arquivos, qtde_arquivos_processados, 
+                       tamanho_bytes, qtde_registros, qtde_registros_invalidos):
 
     cursor = conexao_bd.cursor()
 
@@ -30,6 +30,7 @@ def upd_pipeline_cycle(conexao_bd, id_cycle, fim_cycle, duracao, qtde_arquivos, 
                 tamanho_bytes = %s, qtde_registros = %s, qtde_registros_invalidos = %s, status = 'SUCESSO'
                 WHERE id_cycle = %s;"""
     
-    valores = (fim_cycle, duracao, qtde_arquivos, qtde_arquivos_processados, tamanho_bytes, qtde_registros, qtde_registros_invalidos, id_cycle)
+    valores = (fim_cycle, duracao, qtde_arquivos, qtde_arquivos_processados, tamanho_bytes, qtde_registros, 
+               qtde_registros_invalidos, id_cycle)
 
     cursor.execute(query, valores)
