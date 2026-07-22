@@ -3,19 +3,19 @@ from pipeline.src.raw.extract.extract_json import encontrar_arquivos, contar_reg
 from pipeline.src.silver.silver_main import etapa_silver
 from pipeline.src.gold.gold_main import etapa_gold, etapa_gold_calendario
 
-from pipeline.common.database.conx_database import get_db_connection
-from pipeline.common.context.pipeline_context import gerar_id_contexto, upd_watermark_exec
-from pipeline.common.monitoring.pipeline_exec import update_execution
-from pipeline.common.monitoring.pipeline_exec import reg_new_execution
-from pipeline.common.monitoring.pipeline_step import upd_step
-
 from pipeline.common.monitoring.pipeline_cycle import reg_pipeline_cycle, upd_pipeline_cycle
+from pipeline.common.context.pipeline_context  import gerar_id_contexto, upd_watermark_exec
+from pipeline.common.monitoring.pipeline_exec  import update_execution
+from pipeline.common.monitoring.pipeline_exec  import reg_new_execution
+from pipeline.common.monitoring.pipeline_step  import upd_step
 from pipeline.common.database.conx_database import get_db_connection
+from pipeline.common.database.conx_database import get_db_connection
+
+from pipeline.common.exceptions.pipeline_exceptions import UnknownEntityException, DuplicateFileException
+from pipeline.common.exceptions.pipeline_exceptions import  EmptyfileExcept, AllRecordsQuarantinedException, InsertRecordsFail
 
 from pipeline.config.paths import PDV_NEW_FILES_DIR
 from datetime import datetime
-
-from pipeline.common.exceptions.pipeline_exceptions import UnknownEntityException, DuplicateFileException, EmptyfileExcept, AllRecordsQuarantinedException, InsertRecordsFail
 
 conx = get_db_connection()
 
