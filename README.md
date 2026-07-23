@@ -43,21 +43,29 @@ DATA_PIPELINE/
 │   ├── config/
 │   ├── data/
 │   ├── src/
-│   └── simulador/
+│   ├── simulador/
+│   └── README.md
+│
+├── pdv_sales/
+│   ├── pdv_new_files/
+│   ├── pipe_processed_files/
+│   └── pipe_reject_files/
 │
 ├── pipeline/
 │   ├── common/
 │   ├── config/
-│   ├── data_storage/
-│   ├── docs/
+│   ├── database/
 │   ├── src/
-│   └── orquestrador/
+│   ├── orquestrador/
+│   └── README.md
 │
 ├── .env.example
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.MD
 └── requeriments.txs
+
+#obs: o diretorio pdv_sales/ e seus subdiretórios são criados automaticamente durante a execução do pdv_simulator e do pipeline.
 ```
 
 ## Como executar (Finalizar)
