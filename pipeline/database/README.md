@@ -14,7 +14,7 @@ padronização do ambiente de desenvolvimento.
 
 ## Schemas
 
-![Database](../../images/database/database_v3.png)
+![Database](../../images/database/database_tables.png)
 
 O database é composto por quatro schemas, cada um com uma responsabilidade
 específica dentro do pipeline:

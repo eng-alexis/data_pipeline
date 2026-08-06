@@ -25,7 +25,7 @@ O fluxo geral do projeto é composto por quatro componentes principais:
 - Pipeline
 - Relatório de BI
 
-![](images/projeto/projeto_fluxo_v1.png)
+![](images/projeto/projeto_fluxo.png)
 
 ## Componentes do projeto
 
@@ -33,7 +33,7 @@ O fluxo geral do projeto é composto por quatro componentes principais:
 
 Foi desenvolvido um simulador de sistema PDV responsável por gerar arquivos contendo eventos de vendas com base em um intervalo de datas informado pelo usuário.
 
-![](images/pdv_simulator/pdv_fluxo_v1.png)
+![](images/pdv_simulator/pdv_simulator_fluxo.png)
 
 Consulte a documentação do PDV Simulator para obter mais informações sobre seu funcionamento.
 
@@ -46,7 +46,7 @@ O banco de dados é responsável por:
 - Armazenar registros inválidos em tabelas de quarentena;
 - Disponibilizar as estruturas necessárias para as camadas RAW, SILVER e GOLD.
 
-![](images/database/db_schemas_v1.png)
+![](images/database/database_schemas.png)
 
 Consulte a documentação do Database para obter mais informações sobre sua estrutura e configuração.
 
@@ -62,7 +62,7 @@ O pipeline implementa uma arquitetura de dados em camadas (RAW, SILVER e GOLD), 
 - Auditoria das execuções;
 - Disponibilização dos dados para análises de negócio.
 
-![](images/pipeline/pipeline_fluxo_v1.png)
+![](images/pipeline/pipeline_fluxo.png)
 
 Consulte a documentação do Pipeline para obter mais informações sobre seu funcionamento.
 
