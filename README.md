@@ -1,97 +1,123 @@
 # Data Pipeline
 
-Pipeline de engenharia de dados desenvolvido para simular um ambiente de processamento de eventos gerados por um sistema PDV.
+Pipeline de engenharia de dados desenvolvido para simular um ambiente de processamento de eventos gerados por um sistema de PDV (Ponto de Venda).
 
 ## Contexto e problema de negócio
 
-Uma rede de supermercados utiliza um sistema PDV responsavel por disponibilizar diariamente arquivos contendo eventos de vendas de suas lojas.
+Uma rede de supermercados utiliza um sistema PDV responsável por disponibilizar diariamente arquivos contendo eventos de vendas de suas lojas.
 
-[**Clique Aqui**](docs/contexto_projeto.md) para ver o **contexto completo**.
+Para conhecer o cenário de negócio e os requisitos considerados no desenvolvimento do projeto, consulte o [contexto completo do projeto](docs/contexto_projeto.md).
 
-## Objetivo do projeto
+## Objetivos do projeto
 
-- Implementar arquitetura em camadas.
-- Disponibilizar dados para análise de negócio.
-- Automatizar o processamento de arquivos.
+- Implementar uma arquitetura de dados em camadas;
+- Processar e transformar os dados gerados pelo sistema de PDV;
+- Disponibilizar dados preparados para análises de negócio;
+- Automatizar o processamento dos arquivos;
+- Implementar mecanismos de validação, deduplicação e auditoria do processamento.
 
 ## Fluxo do projeto
+
+O fluxo geral do projeto é composto por quatro componentes principais:
+
+- Sistema PDV
+- Database
+- Pipeline
+- Relatório de BI
 
 ![](images/projeto/projeto_fluxo_v1.png)
 
 ## Componentes do projeto
 
-### 1. Sistema PDV
+### 1. PDV Simulator
 
-Foi desenvolvido um `simulador` de sistema PDV que tem como objetivo gerar arquivos de vendas com base num intervalo de datas.
+Foi desenvolvido um simulador de sistema PDV responsável por gerar arquivos contendo eventos de vendas com base em um intervalo de datas informado pelo usuário.
 
 ![](images/pdv_simulator/pdv_fluxo_v1.png)
 
-[**Clique Aqui**](pdv_simulator/README.md) para ver a **documentação** do pdv_simulator.
+Consulte a documentação do PDV Simulator para obter mais informações sobre seu funcionamento.
 
 ### 2. Database
 
-O banco de dados é responsavel por:
-- armazenar os registros disponibilizados pelo sistema de PDV.
-- armazenar um historico de execuções do pipeline.
-- armazenar registros invalidos em quarentena.
+O banco de dados é responsável por:
+
+- Armazenar os registros disponibilizados pelo sistema de PDV;
+- Armazenar o histórico de ciclos e execuções do pipeline;
+- Armazenar registros inválidos em tabelas de quarentena;
+- Disponibilizar as estruturas necessárias para as camadas RAW, SILVER e GOLD.
 
 ![](images/database/db_schemas_v1.png)
 
-[**Clique Aqui**](pipeline/database/README.md) para ver a **documentação** do Database.
+Consulte a documentação do Database para obter mais informações sobre sua estrutura e configuração.
 
 ### 3. Pipeline
 
-O pipeline implementa uma arquitetura em camadas (Raw, Silver e Gold), realizando:
+O pipeline implementa uma arquitetura de dados em camadas (RAW, SILVER e GOLD), realizando:
 
-- Extração e manipulação dos arquivos;
-- Validação, padronização e transformação dos dados;
-- Disponibilização dos dados para analises de negócio.
+- Extração e processamento dos arquivos;
+- Validação dos registros;
+- Padronização e transformação dos dados;
+- Tratamento de registros inválidos;
+- Deduplicação de arquivos;
+- Auditoria das execuções;
+- Disponibilização dos dados para análises de negócio.
 
 ![](images/pipeline/pipeline_fluxo_v1.png)
 
-[**Clique Aqui**](pipeline/README.md) para ver a **documentação** do Pipeline.
+Consulte a documentação do Pipeline para obter mais informações sobre seu funcionamento.
 
-### 4. Relatorio BI
+### 4. Relatório de BI
 
-O relatorio de BI busca responder através de graficos e visuais perguntas como:
+O relatório de BI foi desenvolvido no Power BI para permitir a análise dos dados processados pelo pipeline.
 
-* total faturamento
-* ticket-médio
-* horario de pico
-* produto mais vendidos
+Entre as informações disponibilizadas estão:
 
-#### Preview:
+- Faturamento total;
+- Ticket médio;
+- Horários de pico de vendas;
+- Produtos mais vendidos;
+- Outros indicadores relacionados às vendas.
+
+Preview
 
 ![](dashboard/preview/dash_dark_mode.jpg)
 
+
+Para obter instruções sobre como acessar e visualizar o dashboard, consulte o guia de execução.
+
 ## Resultados do projeto
 
-O projeto garante:
-* O desenvolvimento de um banco de dados para os registros disponibilizados pelo sistema de pdv.
-* A persistencia de registros no seu estado original (camada raw)
-* Dados padronizados (camada silver)
-* Dados transformados e enriquecidos para analises de bi (camada gold)
-* Deduplicação barrando arquivos duplicados.
-* Define um contrato de dados (verificação de schema)
-* Disponibiliza um historico de execuções do pipeline
+Ao final do processamento, o projeto disponibiliza:
+
+- Banco de dados para armazenamento dos registros gerados pelo sistema de PDV;
+- Persistência dos dados em seu estado original na camada RAW;
+- Dados validados e padronizados na camada SILVER;
+- Dados transformados e enriquecidos para análises de BI na camada GOLD;
+- Mecanismo de deduplicação para impedir o processamento de arquivos duplicados;
+- Validação de schema como contrato de dados;
+- Registro de arquivos inválidos em tabelas de quarentena;
+- Histórico de ciclos e execuções do pipeline para fins de auditoria.
 
 ## Tecnologias utilizadas
 
-|Categoria | Software|
+|Categoria | Tecnologia|
 |-----|-----|
+|Linguagem | Python 3.12+|
 |Banco de dados | PostgreSQL|
 |Containerização | Docker|
 |Dashboard | Power BI|
-|Pipeline | Python|
 |Versionamento | Git|
 
 ## Estrutura do projeto
 
-```bash
+```text
 DATA_PIPELINE/
 │
 ├── dashboard/
+│   └── preview/
+│
 ├── docs/
+│
 ├── images/
 │
 ├── pdv_simulator/
@@ -116,34 +142,36 @@ DATA_PIPELINE/
 │
 ├── .env.example
 ├── .gitignore
-├── docker🔲compose.yml
-├── README.MD
-└── requeriments.txs
-
-#obs: o diretorio pdv_sales/ e seus subdiretórios são criados automaticamente durante a execução do pdv_simulator e do pipeline.
+├── docker-compose.yml
+├── README.md
+└── requirements.txt
 ```
+Observação: 
+> **Observação:** o diretório pdv_sales e seus subdiretórios são criados automaticamente durante a execução do pdv_simulator e do pipeline.
 
-## Como executar o projeto.
+## Como executar
 
-[**Clique Aqui**](docs/como_executar.md) para ver o **guia de execução** do projeto.
+Consulte o [guia de execução](docs/como_executar.md) para obter as instruções de instalação, configuração e execução do projeto.
 
-## Links para documentações
+## Documentação
 
-[**Documentação**](pdv_simulator/README.md) do pdv_simulator
-
-[**Documentação**](pipeline/database/README.md) do database
-
-[**Documentação**](pipeline/README.md) do pipeline
+- [Contexto](docs/contexto_projeto.md) — contexto e problema de negócio.
+- [PDV Simulator](pdv_simulator/README.md) — documentação do simulador responsável pela geração dos arquivos de vendas.
+- [Pipeline](pipeline/README.md) — documentação do pipeline de dados e suas etapas.
+- [Database](pipeline/database/README.md) — documentação da estrutura e configuração do banco de dados.
 
 ## Versões do projeto
 
-✅ V1
+V1 — Concluída ✅
 
-- Pipeline funcionando
-- Raw
-- Silver
-- Gold
-- Power BI
+- Pipeline funcional;
+- Camada RAW;
+- Camada SILVER;
+- Camada GOLD;
+- Dashboard desenvolvido no Power BI;
+- Validação de schema;
+- Deduplicação de arquivos;
+- Auditoria das execuções.
 
 ## Desenvolvedor
 
