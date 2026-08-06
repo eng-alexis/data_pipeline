@@ -1,11 +1,19 @@
+print("""
+
++----------------- PDV SIMULATOR ------------------+
+
+▷ Simulador iniciado
+""")
+
 from pdv_simulator.src.create_json import salvar_json, export_catalogo, export_lojas
 from pdv_simulator.src.sales_day_simulatior import day_simulation
 from pdv_simulator.config.paths import PDV_NEW_FILES_DIR
-from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA
+from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA, QTD_DIAS
+from datetime import datetime
+
+inicio_simulador = datetime.now()
 
 contador = 0
-
-print("pdv_simulator iniciado")
 
 for data in DATA:
 
@@ -34,4 +42,19 @@ for data in DATA:
         export_catalogo(produtos)
         export_lojas(lojas)
 
-print(f"{contador} arquivo(s) gerados pelo pdv_simulator")
+fim_simulador = datetime.now()
+diferenca = (fim_simulador - inicio_simulador)
+duracao   = int((diferenca.total_seconds()*1000))
+
+print(f"""
+▶ Simulador finalizado
+
++-------------------- Resumo ----------------------+
+
+• Total de dias simulados         = {QTD_DIAS}
+• Total de arquivos gerados       = {contador}
+• Duração (segundos) do simulador = {duracao/1000:.1f} segs
+
++--------------------------------------------------+
+
+""")

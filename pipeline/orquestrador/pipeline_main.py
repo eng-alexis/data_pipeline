@@ -23,7 +23,11 @@ path_padrão = PDV_NEW_FILES_DIR
 
 tipos_esperados = ["jsonl", "json"]
 
-print("Pipeline Iniciado")
+print("""
++---------------- DATA PIPELINE ---------------+
+
+▷ Ciclo iniciado
+""")
 
 conx = get_db_connection()
 
@@ -149,13 +153,28 @@ for tipo in tipos_esperados:
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
                 upd_step(conx, id_exec, fim_pipeline, "ERRO", 'RAW', duracao=duracao)
                 
-                print(f"Etapa: {etapa} - Erro: {e}")
-             
-print("Pipeline Concluido")
+                print(f"""Etapa: {etapa} - Erro: {e}
+                """)
 
 fim_ciclo = datetime.now()
 diferenca = (fim_ciclo - inicio_ciclo)
 duracao   = int((diferenca.total_seconds()*1000))
+
+print(f"""▶ Ciclo concluido
+
++------------------- Resumo -------------------+
+
+• N° do ciclo                        = {id_ciclo}
+• Duração (segundos) do ciclo        = {duracao/1000:.1f} segs
+• Tamanho total dos arquivos (MB)    = {total_tamanho_files / (1024**2):.2f} MB
+• Quantidade de arquivos encontrados = {total_arquivos_lidos}
+• Quantidade de arquivos processados = {total_arquivos_processados}
+• Quantidade de registros válidos    = {total_qtde_registros:,.0f}
+• Quantidade de registros inválidos  = {total_qtde_registros_invalidos:,.0f}
+
++----------------------------------------------+
+
+""")
 
 upd_pipeline_cycle(conx, id_ciclo, fim_ciclo, duracao, total_arquivos_lidos, total_arquivos_processados, total_tamanho_files,
                     total_qtde_registros, total_qtde_registros_invalidos)
