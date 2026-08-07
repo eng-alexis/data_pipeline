@@ -2,14 +2,20 @@ print("""
 
 +----------------- PDV SIMULATOR ------------------+
 
-▷ Simulador iniciado
+Digite o intervalo que deseja simular:
 """)
 
 from pdv_simulator.src.create_json import salvar_json, export_catalogo, export_lojas
 from pdv_simulator.src.sales_day_simulatior import day_simulation
 from pdv_simulator.config.paths import PDV_NEW_FILES_DIR
-from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA, QTD_DIAS
+from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA, QTD_DIAS, TMP_ESTIMADO
 from datetime import datetime
+
+print(f"""
+▷ Simulador iniciado
+
+Simulando {QTD_DIAS} dia(s) de vendas...
+Tempo estimado = {TMP_ESTIMADO:.1F} segs""")
 
 inicio_simulador = datetime.now()
 

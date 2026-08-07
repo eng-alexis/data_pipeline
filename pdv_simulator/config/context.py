@@ -23,7 +23,8 @@ DATA = pd.date_range(start=data_inicio, end=data_final).strftime('%Y-%m-%d').tol
 
 # Retorna a quantidade de dias que serão simulados
 
-QTD_DIAS = (data_final_valida - data_inicio_valida).days
+QTD_DIAS = ((data_final_valida - data_inicio_valida).days) + 1
+TMP_ESTIMADO = QTD_DIAS * 0.36
 
 # Define a quantidade de lojas e caixas por loja
 

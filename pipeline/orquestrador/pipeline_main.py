@@ -17,6 +17,8 @@ from pipeline.common.exceptions.pipeline_exceptions import  EmptyfileExcept, All
 from pipeline.config.paths import PDV_NEW_FILES_DIR
 from datetime import datetime
 
+from pathlib import Path
+
 conx = get_db_connection()
 
 path_padrão = PDV_NEW_FILES_DIR
@@ -39,6 +41,22 @@ total_arquivos_lidos  = 0
 total_arquivos_processados = 0
 total_qtde_registros = 0 
 total_qtde_registros_invalidos = 0 
+
+qtd_total_arquivos = 0
+
+path = Path(path_padrão)
+
+arquivos_jsonl = list(path.rglob(f"*.jsonl"))
+qtd_total_arquivos += len(arquivos_jsonl)
+
+arquivos_jsonl = list(path.rglob(f"*.json"))
+qtd_total_arquivos += len(arquivos_jsonl)
+
+TMP_ESTIMADO = qtd_total_arquivos * 2.4
+
+print(f"""Quantidade de arquivos encontrados = {qtd_total_arquivos}
+Tempo estimado = {TMP_ESTIMADO:.1F} segs
+""")
 
 for tipo in tipos_esperados:
 
