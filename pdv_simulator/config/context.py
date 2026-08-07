@@ -4,7 +4,7 @@ from datetime import datetime
 # Input que recebe e valida datas de inicio e fim para o simulador
 
 data_inicio = input("digite a data inicial (ex: 2026-01-01): ")
-data_final  = input("digite a data final   (ex: 2026-01-01): ")
+data_final  = input("digite a data final   (ex: 2026-01-02): ")
 
 try:
     data_inicio_valida = datetime.strptime(data_inicio, "%Y-%m-%d").date()
@@ -23,8 +23,7 @@ DATA = pd.date_range(start=data_inicio, end=data_final).strftime('%Y-%m-%d').tol
 
 # Retorna a quantidade de dias que serão simulados
 
-QTD_DIAS = ((data_final_valida - data_inicio_valida).days) + 1
-TMP_ESTIMADO = QTD_DIAS * 0.36
+QTD_DIAS = ((data_final_valida - data_inicio_valida).days) + 1   
 
 # Define a quantidade de lojas e caixas por loja
 

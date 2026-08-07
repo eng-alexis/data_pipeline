@@ -175,4 +175,4 @@ V1 — Concluída ✅
 
 ## Desenvolvedor
 
-Alexis Pereira dos Santos
+Alexis Pereira dos Santos | E-mail: alexispereira220@gmail.com

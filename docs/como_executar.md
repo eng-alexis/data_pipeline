@@ -62,7 +62,7 @@ Caso necessário, revise as variáveis presentes no `.env` antes de continuar.
 #### 1.7 Inicie os containers
 
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 Verifique se os containers foram iniciados corretamente:
@@ -105,9 +105,9 @@ Exemplo:
 Ao finalizar, o simulador exibe no terminal um resumo com informações sobre a simulação:
 
 ```text
+• Duração (minutos) do simulador
 • Total de dias simulados
 • Total de arquivos gerados
-• Duração (segundos) do simulador
 ```
 
 ### 2.2 Executar o pipeline
@@ -140,10 +140,11 @@ Ao finalizar o ciclo, o orquestrador exibe no terminal um resumo com informaçõ
 
 ```text
 • Nº do ciclo
-• Duração (segundos) do ciclo
-• Tamanho total dos arquivos (MB)
-• Quantidade de arquivos encontrados
+• Duração (minutos) do ciclo
+• Quantidade de arquivos localizados
 • Quantidade de arquivos processados
+• Quantidade de arquivos rejeitados
+• Tamanho total dos arquivos (MB)
 • Quantidade de registros válidos
 • Quantidade de registros inválidos
 ```

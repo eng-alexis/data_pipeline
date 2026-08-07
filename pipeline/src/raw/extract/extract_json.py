@@ -61,7 +61,7 @@ def descobrir_entidade(arquivo):
     elif entidade_2 in arquivo.name:
         return entidade_2
     
-    elif "20" in arquivo.name:
+    elif "eventos" in arquivo.name:
         return entidade_3
     
 

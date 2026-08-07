@@ -28,7 +28,7 @@ tipos_esperados = ["jsonl", "json"]
 print("""
 +---------------- DATA PIPELINE ---------------+
 
-▷ Ciclo iniciado
+---------------- Ciclo iniciado ----------------
 """)
 
 conx = get_db_connection()
@@ -39,23 +39,23 @@ id_ciclo = reg_pipeline_cycle(conx, inicio_ciclo)
 total_tamanho_files   = 0
 total_arquivos_lidos  = 0
 total_arquivos_processados = 0
+total_arquivos_rejeitados = 0
 total_qtde_registros = 0 
 total_qtde_registros_invalidos = 0 
 
 qtd_total_arquivos = 0
-
 path = Path(path_padrão)
 
 arquivos_jsonl = list(path.rglob(f"*.jsonl"))
 qtd_total_arquivos += len(arquivos_jsonl)
+arquivos_json = list(path.rglob(f"*.json"))
+qtd_total_arquivos += len(arquivos_json)
 
-arquivos_jsonl = list(path.rglob(f"*.json"))
-qtd_total_arquivos += len(arquivos_jsonl)
+print(f"""— Localizando arquivos no diretório...
+— Quantidade de arquivos localizados = {qtd_total_arquivos}
+— Processando {qtd_total_arquivos} arquivo(s)...
 
-TMP_ESTIMADO = qtd_total_arquivos * 2.4
-
-print(f"""Quantidade de arquivos encontrados = {qtd_total_arquivos}
-Tempo estimado = {TMP_ESTIMADO:.1F} segs
+por favor aguarde...
 """)
 
 for tipo in tipos_esperados:
@@ -109,6 +109,7 @@ for tipo in tipos_esperados:
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
                 duracao = int((diferenca.total_seconds()*1000))
+                total_arquivos_rejeitados += 1
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
@@ -120,6 +121,7 @@ for tipo in tipos_esperados:
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
                 duracao = int((diferenca.total_seconds()*1000))
+                total_arquivos_rejeitados += 1
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
@@ -131,6 +133,7 @@ for tipo in tipos_esperados:
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
                 duracao = int((diferenca.total_seconds()*1000))
+                total_arquivos_rejeitados += 1
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
@@ -142,6 +145,7 @@ for tipo in tipos_esperados:
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
                 duracao = int((diferenca.total_seconds()*1000))
+                total_arquivos_rejeitados += 1
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo="REGISTROS_INVALIDOS", mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
@@ -153,6 +157,7 @@ for tipo in tipos_esperados:
                 fim_pipeline = datetime.now()
                 diferenca = (fim_pipeline - inicio_step)
                 duracao = int((diferenca.total_seconds()*1000))
+                total_arquivos_rejeitados += 1
 
                 update_execution(conx, id_exec, fim_pipeline, arquivo= e.arquivo, status=e.status, motivo=e.motivo, mensagem=e.mensagem)
                 upd_watermark_exec(conx, id_exec, fim_pipeline)
@@ -178,20 +183,22 @@ fim_ciclo = datetime.now()
 diferenca = (fim_ciclo - inicio_ciclo)
 duracao   = int((diferenca.total_seconds()*1000))
 
-print(f"""▶ Ciclo concluido
+print(f"""--------------- Ciclo finalizado ---------------
 
-+------------------- Resumo -------------------+
+-------------------- Resumo --------------------
 
 • N° do ciclo                        = {id_ciclo}
-• Duração (segundos) do ciclo        = {duracao/1000:.1f} segs
-• Tamanho total dos arquivos (MB)    = {total_tamanho_files / (1024**2):.2f} MB
-• Quantidade de arquivos encontrados = {total_arquivos_lidos}
+• Duração (minutos) do ciclo         = {(duracao/1000) // 60:.0f}m {(duracao/1000) % 60:.0f}s 
+
+• Quantidade de arquivos localizados = {total_arquivos_lidos}
 • Quantidade de arquivos processados = {total_arquivos_processados}
+• Quantidade de arquivos rejeitados  = {total_arquivos_rejeitados}
+• Tamanho total dos arquivos (MB)    = {total_tamanho_files / (1024**2):.2f} MB
+
 • Quantidade de registros válidos    = {total_qtde_registros:,.0f}
 • Quantidade de registros inválidos  = {total_qtde_registros_invalidos:,.0f}
 
 +----------------------------------------------+
-
 """)
 
 upd_pipeline_cycle(conx, id_ciclo, fim_ciclo, duracao, total_arquivos_lidos, total_arquivos_processados, total_tamanho_files,
