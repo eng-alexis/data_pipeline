@@ -1,7 +1,3 @@
-from pdv_simulator.src.create_json import salvar_json, export_catalogo, export_lojas
-from pdv_simulator.src.sales_day_simulatior import day_simulation
-from pdv_simulator.config.paths import PDV_NEW_FILES_DIR, NUM_SIMULATIONS
-
 print("""
 
 +----------------- PDV SIMULATOR ------------------+
@@ -9,6 +5,9 @@ print("""
 Digite o intervalo que deseja simular:
 """)
 
+from pdv_simulator.src.create_json import salvar_json, export_catalogo, export_lojas
+from pdv_simulator.src.sales_day_simulatior import day_simulation
+from pdv_simulator.config.paths import PDV_NEW_FILES_DIR, NUM_SIMULATIONS
 from pdv_simulator.config.context import LOJAS, CAIXAS_POR_LOJA, DATA, QTD_DIAS
 from pdv_simulator.history.simulations import get_num_simulations, update_num_simulations
 from datetime import datetime
