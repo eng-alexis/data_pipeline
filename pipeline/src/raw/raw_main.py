@@ -10,6 +10,7 @@ from pipeline.src.raw.load.load_raw import load_to_raw, load_to_quarentine
 from pipeline.config.paths import PIPE_PROCESSED_FILES_DIR, PIPE_DUPLICATE_FILES_DIR, PIPE_INVALID_ENTITY_DIR, PIPE_EMPTY_FILES_DIR
 from pipeline.common.exceptions.pipeline_exceptions import UnknownEntityException, DuplicateFileException, EmptyfileExcept, AllRecordsQuarantinedException, InsertRecordsFail
 from datetime import datetime
+from pathlib import Path
 
 # Diretorios
 
@@ -30,7 +31,7 @@ def etapa_raw(id_execution, arquivo_original):
     id_exec = id_execution
 
     path_arquivo = arquivo_original
-    nome_arquivo = file_new_name(path_arquivo, inicio_step)
+    nome_arquivo = Path(path_arquivo).name
 
     # Descobre e valida a entidade do arquivo
 
@@ -162,8 +163,6 @@ def etapa_raw(id_execution, arquivo_original):
 
     if (load_tentativa_1 + load_tentativa_2) == 0:
 
-        path_arquivo = rename_file(path_arquivo, entidade, inicio_step)
-
         move = move_file(path_arquivo, path_processado)
 
         raise AllRecordsQuarantinedException(arquivo=nome_arquivo, entidade=entidade, inicio= inicio_step, 
@@ -176,7 +175,7 @@ def etapa_raw(id_execution, arquivo_original):
 
         data_ingestao = datetime.now()
     
-        id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo,data_ingestao, tamanho_bytes, id_exec)    
+        id_arquivo = reg_new_file(conexao_bd, hash_arquivo, nome_arquivo, data_ingestao, tamanho_bytes, id_exec)    
 
         fim_step = datetime.now()
         diferenca = (fim_step - inicio_step)
@@ -190,8 +189,6 @@ def etapa_raw(id_execution, arquivo_original):
         conexao_bd.commit()
 
         # Move arquivos processados e finaliza a etapa de ingestão.
-
-        path_arquivo = rename_file(path_arquivo, entidade, inicio_step)
 
         move = move_file(path_arquivo, path_processado)
 
