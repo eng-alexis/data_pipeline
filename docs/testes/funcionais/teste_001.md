@@ -25,7 +25,7 @@ Total de dias simulados: **10 dias**
 ## 3. Execução
 
 **Comando**
-```python
+```text
 python3 -m pdv_simulator.simulador.pdv_main
 ```
 
