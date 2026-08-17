@@ -42,7 +42,7 @@ python3 -m pipeline.orquestrador.pipeline_main
 
 #### Objetivo:
 
-Verificar se todos os arquivos gerados pelo simulador foram processados pela camada RAW.
+Verificar se todos os `22` arquivos gerados pelo simulador foram processados pela camada RAW.
 
 #### Consulta:
 
@@ -53,11 +53,11 @@ SELECT COUNT(*) FROM audit.file_history WHERE status = 'PROCESSADO';
 #### Resultado:
 
 ```text
-22 arquivos processados
+22 arquivos processados pelo pipeline.
 ```
 #### Conclusão:
 
-O numero de arquivos processados corresponde ao numero exato de arquivos gerados pelo simulador.
+O numero de arquivos processados (22) corresponde ao numero exato de arquivos gerados pelo simulador (22).
 
 #### Status: ✅ PASSOU
 
@@ -83,7 +83,7 @@ SELECT COUNT(*) FROM raw.eventos;
 
 #### Conclusão: 
 
-O numero de registros validos corresponde ao numero de registros gerados pelo simulador.
+Durante a execução, o pipeline processou `28.241` registros **validos**.
 
 #### Status: ✅ PASSOU
 
@@ -109,7 +109,7 @@ SELECT COUNT(*) FROM raw.quarantine;;
 
 #### Conclusão: 
 
-Não foi encontrado nenhum registro invalido na tabela de quarentena.
+Durante a execução, o pipeline não identificou nenhum registro **invalido**.
 
 #### Status: ✅ PASSOU
 
@@ -185,7 +185,7 @@ Silver = 28.241
 
 #### Objetivo: 
 
-Verificar se a quantidade de registros das tabelas é a mesma quantidade disponibilizada pela tabela raw.eventos. 
+Verificar se a quantidade de registros disponibilizados pela camada Gold é a mesma quantidade disponibilizada pela camada Silver.
 
 #### Consulta:
 
@@ -204,7 +204,7 @@ gold.fato_vendas  = 18734
 gold.dim_produtos = 50
 gold.dim_lojas    = 1
 --------------------------
-Total            18.785
+Total               18.785
 ```
 
 **Observação:** A quantidade de registros da `gold.fato_vendas` é inferior à quantidade de registros da `silver.eventos` porque a camada Gold considera apenas eventos cujo tipo_evento corresponde a `item adicionado`.
@@ -221,6 +221,10 @@ SELECT COUNT(*) FROM silver.eventos WHERE tipo_evento = 'item adicionado';
 18.734 registros do tipo "item adicionado"
 ```
 
+#### Conclusão: 
+
+A camado Gold disponibiliza corretamente os registros relacionados ao tipo de eventos `"item adicionado"`.
+
 #### Status: ✅ PASSOU
 
 ---
@@ -229,7 +233,7 @@ SELECT COUNT(*) FROM silver.eventos WHERE tipo_evento = 'item adicionado';
 
 #### Objetivo:
 
-Verificar se existem registros na gold.fato_vendas cujo valor_total seja diferente do resultado da multiplicação entre valor_unitario e quantidade.
+Verificar se existem registros na gold.fato_vendas cujo `valor_total` seja diferente do resultado da multiplicação entre `valor_unitario` e `quantidade`.
 
 ```sql
 WITH
@@ -270,7 +274,7 @@ Nenhum valor inconsitente foi identificado.
 
 #### Objetivo: 
 
-Verificar se a GOLD esta armazenando as informações de data corretamente na dimensão calêndario.
+Verificar se a camada Gold esta armazenando as informações de data corretamente na dimensão calêndario.
 
 #### Consulta:
 
@@ -281,7 +285,7 @@ SELECT COUNT(*) FROM gold.dim_calendario;
 #### Resultado:
 
 ```text
-10 datas encontrados na dimensão calendário 
+10 datas distintas encontrados na dimensão calendário 
 ```
 
 #### Consulta:
@@ -299,7 +303,7 @@ SELECT MIN(data), MAX(data), COUNT(*) FROM gold.dim_calendario;
 
 #### Conclusão: 
 
-A camada GOLD extrai e armazena corretamente as datas referentes aos arquivos gerados pelo simulador.
+A camada Gold extrai e armazena corretamente as datas referentes aos arquivos gerados pelo simulador.
 
 #### Status: ✅ PASSOU
 
@@ -346,13 +350,20 @@ As evidências `visuais` complementares podem ser encontradas em:
 
 ## 9. Conclusão
 
-O Pipeline foi executado utilizando 22 arquivos gerados pelo PDV Simulator.
+- O pipeline localizou e processou 22 arquivos (json e jsonl) gerados pelo PDV Simulator.
+- Nenhum erro/exception foi disparado durante a execução.
+- Cada arquivo foi validado, processado e movido para pasta de arquivos processados.
 
-O resultado obtido foi compatível com o esperado:
+Resultados:
 
 ```text
-= 22 arquivos processados
+- 22 arquivos localizados.
+
+- Camada RAW    → 28.241 registros na sua forma bruta.
+- Camada SILVER → 28.241 registros padronizados.
+- Camada GOLD   → 8.785  registros prontos para analises de BI.
+
+- 22 arquivos processados.
 ```
-O pipeline apresentaram o comportamento esperado.
 
 Resultado final: **TESTE APROVADO**.

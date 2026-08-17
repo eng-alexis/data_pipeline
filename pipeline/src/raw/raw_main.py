@@ -188,7 +188,7 @@ def etapa_raw(id_execution, arquivo_original):
 
         conexao_bd.commit()
 
-        # Move arquivos processados e finaliza a etapa de ingestão.
+        # Move arquivos processados e finaliza a etapa de ingestão.   
 
         move = move_file(path_arquivo, path_processado)
 
