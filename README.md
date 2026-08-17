@@ -2,6 +2,25 @@
 
 Pipeline de engenharia de dados desenvolvido para simular um ambiente de processamento de eventos gerados por um sistema de PDV (Ponto de Venda).
 
+## Sumário
+
+<details>
+  <summary>Clique para expandir o Sumário</summary>
+  <ol>
+    <li><a href="#contexto-e-problema-de-negocio">Contexto e problema de negócio</a></li>
+    <li><a href="#objetivos-do-projeto">Objetivos do projetor</a></li>
+    <li><a href="#fluxo-do-projeto">Fluxo do projeto</a></li>
+    <li><a href="#componentes-do-projeto">Componentes do projeto</a></li>
+    <li><a href="#resultados-do-projeto">Resultados do projeto</a></li>
+    <li><a href="#tecnologias-utilizadas">Tecnologias utilizadas</a></li>
+    <li><a href="#estrutura-do-projeto">Estrutura do projeto</a></li>
+    <li><a href="#como-executar">Como executar</a></li>
+    <li><a href="#documentação">Documentação</a></li> 
+    <li><a href="#versões-do-projeto">Versões do projeto</a></li> 
+    <li><a href="#desenvolvedor">Desenvolvedor</a></li>
+  </ol>
+</details>
+
 ## Contexto e problema de negócio
 
 Uma rede de supermercados utiliza um sistema PDV responsável por disponibilizar diariamente arquivos contendo eventos de vendas de suas lojas.
