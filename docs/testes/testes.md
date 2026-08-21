@@ -6,13 +6,15 @@ Este diretório apresenta os testes realizados no projeto, contemplando o `PDV S
 
 | ID        | Teste              | Tipo           | Status |
 |-----------|--------------------|----------------|:------:|
-| TESTE_001 | PDV Simulator      | Funcionalidade | ✅    |
-| TESTE_002 | Pipeline           | Funcionalidade | ✅    |
-| TESTE_003 | Projeto            | Integração     | ✅    |
-| TESTE_004 | Simulando 1 dia    | volume         | 🔲    |
-| TESTE_005 | Simulando 1 semana | volume         | 🔲    |
-| TESTE_006 | Simulando 1 mês    | volume         | 🔲    |
-| TESTE_007 | Simulando 1 ano    | volume         | 🔲    |
+| teste_001 | PDV Simulator      | Funcionalidade | ✅    |
+| teste_002 | Pipeline           | Funcionalidade | ✅    |
+| teste_003 | Fluxo do projeto   | Integração     | ✅    |
+| teste_004 | Simulando 1 dia    | volume         | 🔲    |
+| teste_005 | Simulando 1 semana | volume         | 🔲    |
+| teste_006 | Simulando 1 mês    | volume         | 🔲    |
+| teste_007 | Simulando 1 ano    | volume         | 🔲    |
+
+---
 
 ## 1. Objetivos
 
@@ -84,7 +86,12 @@ Verificam o comportamento do sistema diante de situações inesperadas:
 
 ### Testes Funcionais
 
-- [PDV_SIMULATOR](funcionais/teste_001.md) - Documentação do teste realizado no PDV SIMULATOR
+- [PDV Simulator](funcionais/teste_001.md) - Documentação do teste realizado no PDV Simulator.
+- [Pipeline](funcionais/teste_002.md) - Documentação do teste realizado no Pipeline.
+
+### Teste de integração
+
+- [Integração](integracao/teste_003.md) - Documentação do teste de integração dos compotentes do projeto.
 
 ## Status da realização dos testes
 

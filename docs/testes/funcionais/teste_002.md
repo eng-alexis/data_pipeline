@@ -353,7 +353,7 @@ As evidências `textuais` da execução estão registradas neste documento.
 
 As evidências `visuais` complementares podem ser encontradas em:
 
-`docs/testes/evidencias/TESTE_002/`
+`docs/testes/evidencias/teste_002/`
 
 ## 9. Conclusão
 

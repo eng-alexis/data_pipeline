@@ -308,7 +308,7 @@ As evidências `textuais` da execução estão registradas neste documento.
 
 As evidências `visuais` complementares podem ser encontradas em:
 
-`docs/testes/evidencias/TESTE_003/`
+`docs/testes/evidencias/teste_003/`
 
 ---
 
