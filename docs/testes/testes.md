@@ -2,6 +2,18 @@
 
 Este diretório apresenta os testes realizados no projeto, contemplando o `PDV Simulator`, o `pipeline de dados` e o `fluxo completo` de processamento das informações.
 
+## Testes realizados
+
+| ID        | Teste              | Tipo           | Status |
+|-----------|--------------------|----------------|:------:|
+| TESTE_001 | PDV Simulator      | Funcionalidade | ✅    |
+| TESTE_002 | Pipeline           | Funcionalidade | ✅    |
+| TESTE_003 | Projeto            | Integração     | ✅    |
+| TESTE_004 | Simulando 1 dia    | volume         | 🔲    |
+| TESTE_005 | Simulando 1 semana | volume         | 🔲    |
+| TESTE_006 | Simulando 1 mês    | volume         | 🔲    |
+| TESTE_007 | Simulando 1 ano    | volume         | 🔲    |
+
 ## 1. Objetivos
 
 Os testes possuem os seguintes objetivos:

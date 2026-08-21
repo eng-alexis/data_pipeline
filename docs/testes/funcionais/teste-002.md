@@ -2,6 +2,13 @@
 
 Este teste tem como objetivo: validar o processamento e a integridade dos dados ao longo das camadas `Raw`, `Silver` e `Gold`.
 
+## Status
+
+✅ PASSOU
+
+## Data do teste
+14/08/2026
+
 ## 1. Origem dos arquivos
 
 ### Simulador
@@ -365,5 +372,7 @@ Resultados:
 
 - 22 arquivos processados.
 ```
+
+### Status final
 
 Resultado final: **TESTE APROVADO**.

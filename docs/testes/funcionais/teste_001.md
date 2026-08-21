@@ -268,4 +268,6 @@ O resultado obtido foi compatível com o esperado:
 ```
 Os arquivos analisados apresentaram os formatos e estruturas esperados.
 
+### Status final
+
 Resultado final: **TESTE APROVADO**.
