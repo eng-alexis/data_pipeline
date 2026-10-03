@@ -238,10 +238,6 @@ Os testes de volume foram executados utilizando diferentes períodos de simulaç
 | 1 mês    | ✅    |
 | 1 ano    | ✅    | 
 
-### Observações
-
-*A registrar após a execução dos testes.*
-
 ### Status final
 
 Resultado final: **TESTE APROVADO**.

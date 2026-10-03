@@ -4,15 +4,14 @@ Este diretório apresenta os testes realizados no projeto, contemplando o `PDV S
 
 ## Testes realizados
 
-| ID        | Teste              | Tipo           | Status |
-|-----------|--------------------|----------------|:------:|
-| teste_001 | PDV Simulator      | Funcionalidade | ✅    |
-| teste_002 | Pipeline           | Funcionalidade | ✅    |
-| teste_003 | Fluxo do projeto   | Integração     | ✅    |
-| teste_004 | Simulando 1 dia    | volume         | 🔲    |
-| teste_005 | Simulando 1 semana | volume         | 🔲    |
-| teste_006 | Simulando 1 mês    | volume         | 🔲    |
-| teste_007 | Simulando 1 ano    | volume         | 🔲    |
+| ID        | Teste                        | Tipo           | Status |
+|-----------|------------------------------|----------------|:------:|
+| teste_001 | PDV Simulator                | Funcionalidade | ✅    |
+| teste_002 | Pipeline                     | Funcionalidade | ✅    |
+| teste_003 | Fluxo do projeto             | Integração     | ✅    |
+| teste_004 | Simulando intervalos         | Volume         | ✅    |
+| teste_005 | Exceções                     | Validação      | 🔲    |
+
 
 ---
 
@@ -92,6 +91,10 @@ Verificam o comportamento do sistema diante de situações inesperadas:
 ### Teste de integração
 
 - [Integração](integracao/teste_003.md) - Documentação do teste de integração dos compotentes do projeto.
+
+### Teste de Volume
+
+- [Volume](volume/teste_004.md) - Documentação do teste de volume.
 
 ## Status da realização dos testes
 

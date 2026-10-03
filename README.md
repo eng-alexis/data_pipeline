@@ -54,7 +54,7 @@ Foi desenvolvido um simulador de sistema PDV responsável por gerar arquivos con
 
 ![](images/pdv_simulator/pdv_simulator_fluxo.png)
 
-Consulte a documentação do PDV Simulator para obter mais informações sobre seu funcionamento.
+Consulte a [documentação do PDV Simulator](pdv_simulator/README.md) para obter mais informações sobre seu funcionamento.
 
 ### 2. Database
 
@@ -67,7 +67,7 @@ O banco de dados é responsável por:
 
 ![](images/database/database_schemas.png)
 
-Consulte a documentação do Database para obter mais informações sobre sua estrutura e configuração.
+Consulte a documentação do Database [documentação do Database](pipeline/database/README.md) para obter mais informações sobre sua estrutura e configuração.
 
 ### 3. Pipeline
 
@@ -83,7 +83,7 @@ O pipeline implementa uma arquitetura de dados em camadas (RAW, SILVER e GOLD), 
 
 ![](images/pipeline/pipeline_fluxo.png)
 
-Consulte a documentação do Pipeline para obter mais informações sobre seu funcionamento.
+Consulte a [documentação do Pipeline](pipeline/README.md) para obter mais informações sobre seu funcionamento.
 
 ### 4. Relatório de BI
 
@@ -102,7 +102,7 @@ Preview
 ![](dashboard/preview/dash_dark_mode.jpg)
 
 
-Para obter instruções sobre como acessar e visualizar o dashboard, consulte o guia de execução.
+Para obter instruções sobre como acessar e visualizar o dashboard, consulte o [guia de execução](docs/como_executar.md).
 
 ## Resultados do projeto
 
@@ -178,6 +178,7 @@ Consulte o [guia de execução](docs/como_executar.md) para obter as instruçõe
 - [PDV Simulator](pdv_simulator/README.md) — documentação do simulador responsável pela geração dos arquivos de vendas.
 - [Pipeline](pipeline/README.md) — documentação do pipeline de dados e suas etapas.
 - [Database](pipeline/database/README.md) — documentação da estrutura e configuração do banco de dados.
+- [Testes](docs/testes/testes.md) - documentação de testes do projeto.
 
 ## Versões do projeto
 
